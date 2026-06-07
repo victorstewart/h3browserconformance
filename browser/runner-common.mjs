@@ -8,6 +8,31 @@ export function sleep(ms) {
   return new Promise((resolveSleep) => setTimeout(resolveSleep, ms));
 }
 
+function webdriverCommandTimeoutMs() {
+  const timeoutMs = Number(process.env.PICOQUIC_WT_WEBDRIVER_COMMAND_TIMEOUT_MS || 60000);
+  return Number.isFinite(timeoutMs) && timeoutMs > 0 ? timeoutMs : 60000;
+}
+
+async function fetchWithTimeout(url, options = {}, timeoutMs = webdriverCommandTimeoutMs()) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => {
+    controller.abort();
+  }, timeoutMs);
+  try {
+    return await fetch(url, {
+      ...options,
+      signal: controller.signal
+    });
+  } catch (error) {
+    if (error && error.name === "AbortError") {
+      throw new Error(`fetch timeout after ${timeoutMs} ms`);
+    }
+    throw error;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 export function parseIntegerArrayEnv(name, fallback) {
   const value = process.env[name];
   if (!value) {
@@ -357,7 +382,7 @@ export async function waitForWebDriver(endpoint, childOutput, driverName, timeou
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
     try {
-      const response = await fetch(`${endpoint}/status`);
+      const response = await fetchWithTimeout(`${endpoint}/status`, {}, 1000);
       if (response.ok) {
         return;
       }
@@ -368,7 +393,7 @@ export async function waitForWebDriver(endpoint, childOutput, driverName, timeou
 }
 
 export async function webdriver(endpoint, method, path, body) {
-  const response = await fetch(`${endpoint}${path}`, {
+  const response = await fetchWithTimeout(`${endpoint}${path}`, {
     method,
     headers: body === undefined ? undefined : { "content-type": "application/json" },
     body: body === undefined ? undefined : JSON.stringify(body)
