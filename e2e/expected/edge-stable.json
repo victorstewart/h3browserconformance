@@ -1,0 +1,73 @@
+{
+  "browser": "edge",
+  "channel": "stable",
+  "platform": "linux",
+  "expected": [
+    {
+      "scenario": "datagrams.server-empty",
+      "status": "skip",
+      "category": "browser-bug",
+      "browserVersion": "148.0.3967.83",
+      "platform": "linux",
+      "reason": "Edge stable acknowledges an HTTP Datagram containing only the Quarter Stream ID, but does not expose the resulting zero-length WebTransport datagram to the JavaScript readable stream.",
+      "evidence": "GitHub WebTransportBrowser run 26842019982, Edge job 79151393609, timed out in datagrams.server-empty with datagramLengths=[] after pico_baton logged `datagram, length: 1: 00`."
+    },
+    {
+      "scenario": "datagrams.server-repeat-large",
+      "status": "skip",
+      "category": "browser-bug",
+      "browserVersion": "148.0.3967.83",
+      "platform": "linux",
+      "reason": "Edge stable delivered only a partial repeated 1200-byte server datagram sequence before reporting the WebTransport session closed, so this lane does not claim large repeated server datagram delivery.",
+      "evidence": "GitHub WebTransportBrowser run 26899009323, Edge job 79345920128, failed datagrams.server-repeat-large after receiving eleven 1200-byte datagrams with datagramReceiveMin=16, then reported WebTransportError: The session is closed. Chrome passed the same browser run."
+    },
+    {
+      "scenario": "datagrams.client-repeat-one",
+      "status": "skip",
+      "category": "browser-bug",
+      "browserVersion": "148.0.3967.83",
+      "platform": "linux",
+      "reason": "Edge stable accepted the repeated one-byte browser datagram scenario far enough for pico_baton to observe one sized datagram, but did not complete sixteen browser-to-server datagram writes before the harness timeout.",
+      "evidence": "GitHub WebTransportBrowser run 26863452355, Edge job 79221931483, timed out in core E2E on the repeated one-byte client datagram row after pico_baton logged one `Received sized WebTransport datagram ... length: 1` and then remained waiting."
+    },
+    {
+      "scenario": "datagrams.client-repeat-large",
+      "status": "skip",
+      "category": "browser-bug",
+      "browserVersion": "148.0.3967.83",
+      "platform": "linux",
+      "reason": "Edge stable does not currently claim repeated browser-to-server datagram delivery. The one-byte repeated row delivered only one server-observable datagram before timeout, so the stricter large repeated row remains unclaimed in this lane.",
+      "evidence": "GitHub WebTransportBrowser run 26863452355, Edge job 79221931483, timed out on datagrams.client-repeat-one before datagrams.client-repeat-large could run. The large row depends on the same repeated browser-to-server datagram write behavior."
+    },
+    {
+      "scenario": "reset.browser-cancel-incoming-uni",
+      "status": "pass",
+      "category": "browser-bug",
+      "browserVersion": "148.0.3967.83",
+      "platform": "linux",
+      "reason": "Edge stable completed the browser-visible incoming unidirectional cancel row, but did not reliably produce a server-observable WebTransport-mapped STOP_SENDING frame in consecutive full core runs. Keep the row active while not claiming the server STOP_SENDING counter in this lane.",
+      "evidence": "GitHub WebTransportBrowser run 26921803310, Edge job 79423629250, and run 26922447204, Edge job 79425550524, both failed reset.browser-cancel-incoming-uni only because server.stopSendingReceived was 0 instead of at least 1.",
+      "expect": {
+        "server": {
+          "stopSendingReceivedMin": null,
+          "stopSendingAppError123Min": null
+        }
+      }
+    },
+    {
+      "scenario": "reset.browser-cancel-incoming-bidi",
+      "status": "pass",
+      "category": "browser-bug",
+      "browserVersion": "148.0.3967.83",
+      "platform": "linux",
+      "reason": "Edge stable completed the browser-visible incoming bidirectional cancel row, but did not reliably produce a server-observable WebTransport-mapped STOP_SENDING frame. Keep the row active while not claiming the server STOP_SENDING counter in this lane.",
+      "evidence": "GitHub WebTransportBrowser run 26923501085, Edge job 79428746860, failed reset.browser-cancel-incoming-bidi only because server.stopSendingReceived was 0 instead of at least 1. The same Edge stable lane already has consecutive evidence for the unidirectional incoming-cancel row omitting the same server counter.",
+      "expect": {
+        "server": {
+          "stopSendingReceivedMin": null,
+          "stopSendingAppError123Min": null
+        }
+      }
+    }
+  ]
+}

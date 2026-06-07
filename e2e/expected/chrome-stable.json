@@ -1,0 +1,82 @@
+{
+  "browser": "chrome",
+  "channel": "stable",
+  "platform": "linux",
+  "expected": [
+    {
+      "scenario": "baton.core.padded-byob",
+      "status": "pass",
+      "category": "browser-bug",
+      "browserVersion": "148.0.7778.178",
+      "platform": "linux",
+      "reason": "Chrome stable constructs when allowPooling is true and serverCertificateHashes is non-empty, even though the W3C WebTransport constructor requires NotSupportedError for that option combination.",
+      "evidence": "GitHub run 26796690452 on Chrome 148.0.7778.178 recorded optionsConstructor.ok=false with detail 'constructor did not throw' for baton.core.padded-byob. Local Chrome 148.0.7778.181 on macOS showed the same behavior.",
+      "expect": {
+        "optionsConstructorOk": false
+      }
+    },
+    {
+      "scenario": "baton.core.compact-default-reader",
+      "status": "pass",
+      "category": "browser-bug",
+      "browserVersion": "148.0.7778.178",
+      "platform": "linux",
+      "reason": "Chrome stable constructs when allowPooling is true and serverCertificateHashes is non-empty, even though the W3C WebTransport constructor requires NotSupportedError for that option combination. Chrome 148 old headless can also reject transport.closed with WebTransportError: Connection lost after the full baton exchange has completed and pico_baton has received the final zero baton.",
+      "evidence": "GitHub run 26796690452 on Chrome 148.0.7778.178 recorded optionsConstructor.ok=false with detail 'constructor did not throw' for baton.core.compact-default-reader. Local Chrome 148.0.7778.181 on macOS showed the same behavior. GitHub WebTransportBrowser run 26846296519, Chrome 148.0.7778.178 jobs 79166649793 and 79167387553, completed received=[251,253,255], sent=[252,254,0], datagramsReceived=[252], and server.zeroBatonReceived=1, then rejected transport.closed with WebTransportError: Connection lost.",
+      "expect": {
+        "optionsConstructorOk": false
+      }
+    },
+    {
+      "scenario": "datagrams.server-empty",
+      "status": "skip",
+      "category": "browser-bug",
+      "browserVersion": "148.0.7778.216",
+      "platform": "macOS",
+      "reason": "Chrome stable acknowledges an HTTP Datagram containing only the Quarter Stream ID, but does not expose the resulting zero-length WebTransport datagram to the JavaScript readable stream.",
+      "evidence": "Local macOS Chrome 148.0.7778.216 run of datagrams.server-empty on 2026-06-02 timed out with datagramLengths=[] after pico_baton logged and Chrome ACKed `datagram, length: 1: 00`."
+    },
+    {
+      "scenario": "datagrams.server-repeat-large",
+      "status": "skip",
+      "category": "browser-bug",
+      "browserVersion": "148.0.7778.178",
+      "platform": "linux",
+      "reason": "Chrome stable delivered only a partial repeated 1200-byte server datagram sequence before reporting the WebTransport session closed, so this lane does not claim large repeated server datagram delivery.",
+      "evidence": "GitHub WebTransportBrowser run 26923501085, Chrome job 79428746884, failed datagrams.server-repeat-large after receiving nine 1200-byte datagrams with datagramReceiveMin=16, then reported WebTransportError: The session is closed."
+    },
+    {
+      "scenario": "datagrams.client-repeat-one",
+      "status": "skip",
+      "category": "browser-bug",
+      "browserVersion": "148.0.7778.178",
+      "platform": "linux",
+      "reason": "Chrome stable accepted the repeated one-byte browser datagram scenario far enough for pico_baton to observe one sized datagram, but did not complete sixteen browser-to-server datagram writes before the harness timeout.",
+      "evidence": "GitHub WebTransportBrowser run 26863452355, Chrome job 79221931488, timed out in core E2E on the repeated one-byte client datagram row after pico_baton logged one `Received sized WebTransport datagram ... length: 1` and then remained waiting."
+    },
+    {
+      "scenario": "datagrams.client-repeat-large",
+      "status": "skip",
+      "category": "browser-bug",
+      "browserVersion": "148.0.7778.178",
+      "platform": "linux",
+      "reason": "Chrome stable does not currently claim repeated browser-to-server datagram delivery. The one-byte repeated row delivered only one server-observable datagram before timeout, so the stricter large repeated row remains unclaimed in this lane.",
+      "evidence": "GitHub WebTransportBrowser run 26863452355, Chrome job 79221931488, timed out on datagrams.client-repeat-one before datagrams.client-repeat-large could run. The large row depends on the same repeated browser-to-server datagram write behavior."
+    },
+    {
+      "scenario": "reset.browser-cancel-incoming-uni",
+      "status": "pass",
+      "category": "browser-bug",
+      "browserVersion": "148.0.7778.178",
+      "platform": "linux",
+      "reason": "Chrome 148 old headless on GitHub Actions reads from an incoming unidirectional WebTransport stream and accepts ReadableStream.cancel(), but this run did not produce server-observed STOP_SENDING. Keep the browser data-path row active while not claiming the unidirectional STOP mapping for this Chrome stable lane.",
+      "evidence": "WebTransportBrowser run 26916773667, Chrome job 79408205084, reached reset.browser-cancel-incoming-uni with events 'ready', 'stream read before cancel uni', and 'stream canceled incoming uni', read 262144 bytes, then timed out waiting for transport.closed; the server summary showed connectAccepted=1, streamTestBytesSent=1048576, stopSendingReceived=0, and stopSendingAppError123=0.",
+      "expect": {
+        "server": {
+          "stopSendingReceivedMin": null,
+          "stopSendingAppError123Min": null
+        }
+      }
+    }
+  ]
+}

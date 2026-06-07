@@ -1,0 +1,1010 @@
+{
+  "browser": "firefox",
+  "channel": "stable",
+  "platform": "linux",
+  "references": {
+    "reason.datagrams.server-sized-one": {
+      "reason": "Firefox 151.0.3 in GitHub Actions still uses the protocol=optional endpoint because it does not provide a usable WT-Available-Protocols value in this lane. Keep the exact-size server datagram scenario on the Firefox data path while not claiming selected WT-Protocol exposure."
+    },
+    "reason.reset.browser-abort-bidi": {
+      "reason": "Firefox 151.0.3 in GitHub Actions still uses the protocol=optional endpoint for stream-mode WebTransport rows because it does not provide a usable WT-Available-Protocols value in this lane. Keep the reset/abort row on the data path while not claiming selected WT-Protocol exposure."
+    },
+    "reason.reset.server-reset-bidi": {
+      "reason": "Firefox 151.0.3 in GitHub Actions still uses the protocol=optional endpoint for stream-mode WebTransport rows because it does not provide a usable WT-Available-Protocols value in this lane. Keep the server-reset row on the data path while not claiming selected WT-Protocol exposure."
+    },
+    "reason.reset.server-stop-bidi": {
+      "reason": "Firefox 151.0.3 in GitHub Actions still uses the protocol=optional endpoint for stream-mode WebTransport rows because it does not provide a usable WT-Available-Protocols value in this lane. Keep the server-stop row on the data path while not claiming selected WT-Protocol exposure."
+    },
+    "evidence.baton.core.terminal-wrap-default-reader": {
+      "evidence": "Same positive-path caveat as baton.core.compact-default-reader and baton.core.medium-padded-default-reader: Firefox 151.0.3 completed positive baton exchanges in GitHub WebTransportBrowser runs 26830637957 and 26860542607, while earlier runs 26835514645, 26835807876, and 26836125845 document the closeSession and browserCloseReceived nondeterminism inherited by positive baton scenarios."
+    },
+    "evidence.datagrams.server-sized-one": {
+      "evidence": "Same selected-protocol constraint as datagrams.optional-unreliable, datagrams.server-empty, and datagrams.client-empty: GitHub WebTransportBrowser runs 26829426456 and 26842292496 showed Firefox completes the stream/datagram data path through protocol=optional but does not expose a selected WT-Protocol value in this lane."
+    },
+    "evidence.baton.core.short-padded-default-reader": {
+      "evidence": "Same positive-path caveat as baton.core.medium-padded-default-reader: GitHub WebTransportBrowser run 26830637957 passed after the standalone smoke stopped gating on the already documented bidirectional bad-chunk diagnostic. Earlier Firefox positive-path evidence is recorded on baton.core.compact-default-reader and datagrams.optional-unreliable. Runs 26835514645, 26835807876, and 26836125845 document the closeSession and browserCloseReceived nondeterminism inherited by positive baton scenarios."
+    },
+    "evidence.streams.large-uni-reply-10mb": {
+      "evidence": "Same selected-protocol constraint as streams.large-bidi-echo-10mb: GitHub WebTransportBrowser run 26904158856, Firefox job 79364305271, showed the Firefox compatibility runner appends protocol=optional to the new C201 stream rows."
+    },
+    "evidence.reset.browser-abort-bidi": {
+      "evidence": "Same Firefox stream-mode compatibility path as the C201/C202 stream rows, which passed through protocol=optional in WebTransportBrowser runs 26913123737 and 26914421909."
+    },
+    "evidence.reset.server-reset-bidi": {
+      "evidence": "Same Firefox stream-mode compatibility path as the C201/C202 stream rows and C203 reset rows, which passed through protocol=optional in WebTransportBrowser runs 26913123737, 26914421909, and 26917564358."
+    },
+    "evidence.close.server-immediate": {
+      "evidence": "Same Firefox stream-mode compatibility path as the C201/C202 stream rows and C205 reset/STOP rows, which passed through protocol=optional in WebTransportBrowser runs 26913123737, 26914421909, 26917564358, and 26920504719."
+    },
+    "evidence.close.browser-close": {
+      "evidence": "Same Firefox stream-mode compatibility path as the C201/C202 stream rows and C205 reset/STOP rows, which passed through protocol=optional in WebTransportBrowser runs 26913123737, 26914421909, 26917564358, and 26920504719. Existing Firefox positive-path entries document closeSessionReceived nondeterminism in runs 26802216963, 26835514645, 26835807876, and 26836125845."
+    },
+    "expect.firefox-protocol-optional": {
+      "expect": {
+        "protocol": "",
+        "server": {
+          "optionalProtocolAccepted": null,
+          "optionalProtocolAcceptedMin": 1
+        }
+      }
+    }
+  },
+  "expected": [
+    {
+      "scenario": "handshake.reject_unsupported_protocol",
+      "status": "skip",
+      "category": "browser-missing",
+      "browserVersion": "151.0.2",
+      "platform": "linux",
+      "reason": "Firefox 151.0.2 in GitHub Actions reached pico_baton without a usable WT-Available-Protocols value. The Firefox lane uses protocol=optional to exercise the WebTransport data path, so unsupported-protocol negotiation is not claimed for Firefox in this lane.",
+      "evidence": "GitHub WebTransportBrowser run 26801289699, Firefox job 79008337128, logged Unsupported callback on stream before wt_baton_accept; server trace reached CONNECT path but did not select WT-Protocol."
+    },
+    {
+      "scenario": "handshake.reject_bad_certificate_hash",
+      "status": "skip",
+      "category": "browser-bug",
+      "browserVersion": "151.0.2",
+      "platform": "linux",
+      "reason": "Firefox 151.0.2 in GitHub Actions rejected the local self-signed WebTransport endpoint before CONNECT when relying only on serverCertificateHashes. The Firefox CI lane temporarily uses WebDriver acceptInsecureCerts to exercise picoquic's data path, so wrong-hash certificate enforcement is not claimed for Firefox in this lane.",
+      "evidence": "GitHub WebTransportBrowser run 26801130235, Firefox job 79007856552, failed baton smoke with WebTransportError: WebTransport connection rejected; browser=firefox 151.0.2, geckodriver=0.36.0, server log showed no accepted WebTransport CONNECT."
+    },
+    {
+      "scenario": "handshake.reject_unsupported_certificate_hash_algorithm",
+      "status": "skip",
+      "category": "browser-bug",
+      "browserVersion": "151.0.2",
+      "platform": "linux",
+      "reason": "Firefox CI currently uses WebDriver acceptInsecureCerts to exercise picoquic's WebTransport data path because serverCertificateHashes alone rejected the local self-signed endpoint before CONNECT. While that bypass is enabled, this lane cannot claim unsupported certificate-hash algorithm enforcement.",
+      "evidence": "Same certificate-validation constraint as handshake.reject_bad_certificate_hash: GitHub WebTransportBrowser run 26801130235, Firefox job 79007856552, failed before an accepted CONNECT when relying only on serverCertificateHashes."
+    },
+    {
+      "scenario": "baton.core.padded-byob",
+      "status": "pass",
+      "category": "browser-missing",
+      "browserVersion": "151.0.2",
+      "platform": "linux",
+      "reason": "Firefox 151.0.2 did not provide a usable WT-Available-Protocols value in CI, so the Firefox lane uses the baton protocol=optional endpoint and does not claim selected WT-Protocol exposure. The same browser accepted invalid WebTransport protocols constructor inputs instead of throwing, did not send a WT_CLOSE_SESSION capsule after the positive baton exchange, did not reliably complete the dedicated browser-close diagnostic in the full core sequence, does not reliably expose the browser-close diagnostic close reason to pico_baton, showed nondeterministic server visibility for the writable bad-chunk diagnostic close-reason marker, and can fail bidirectional writable bad-chunk diagnostic setup with InvalidStateError after sequential sessions, so those are recorded as browser API/protocol gaps.",
+      "evidence": "GitHub WebTransportBrowser run 26801289699, Firefox job 79008337128, reached CONNECT path but rejected before wt_baton_accept because no WT-Protocol was selected. Run 26801732536, Firefox job 79009682544, completed the baton exchange but recorded protocolConstructor.ok=false because duplicate, empty, overlong, and non-isomorphic protocols did not throw. Run 26802216963, Firefox job 79011192245, completed Firefox baton smoke and core data exchange but recorded server.closeSessionReceived=0. Run 26802432230, Firefox job 79011866106, recorded server.writableBadChunkCloseReceived=false; run 26802593484, Firefox job 79012384032, recorded the same field true. Run 26802934161, Firefox job 79013469332, failed the compact core scenario because streamWritable reported InvalidStateError on bidirectional-setup. Run 26835514645, Firefox 151.0.3 job 79128194446, recorded closeSession.ok=true but failed baton.core.padded-byob only because server.browserCloseReceived=false. Run 26835807876, Firefox 151.0.3 job 79129244033, failed baton.core.padded-byob on closeSessionOk in the full core sequence. Run 26836125845, Firefox 151.0.3 job 79130370168, recorded server.browserCloseReceived=true, so this field is treated as nondeterministic instead of a stable false assertion.",
+      "expect": {
+        "url": "https://127.0.0.1:4433/baton?version=0&baton=251&count=1&protocol=optional",
+        "protocolConstructorOk": false,
+        "closeSessionOk": null,
+        "closeSessionTestsInclude": [],
+        "streamWritableOk": null,
+        "streamWritableTestsInclude": [
+          "unidirectional-string-chunk"
+        ],
+        "server": {
+          "closeSessionReceivedMin": 0,
+          "writableBadChunkCloseReceived": null,
+          "browserCloseReceived": null
+        }
+      },
+      "expectRef": "expect.firefox-protocol-optional"
+    },
+    {
+      "scenario": "datagrams.optional-unreliable",
+      "status": "pass",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "reason": "Firefox 151.0.3 in GitHub Actions still uses the protocol=optional endpoint because it does not provide a usable WT-Available-Protocols value in this lane. The optional-unreliable scenario passed the stream and datagram data path with requireUnreliable disabled, but it inherits the same Firefox protocol-constructor, selected-protocol, close-capsule, browser-close diagnostic, browser-close reason, and writable diagnostic caveats as the other positive Firefox baton scenarios.",
+      "evidence": "GitHub WebTransportBrowser run 26829426456, Firefox job 79106143959, failed only because the scenario URL assertion expected no protocol=optional query parameter; the logged Firefox baton smoke on the same run showed Firefox 151.0.3 completed the baton exchange with datagramsReceived=[252], datagramsSent=1, protocol='', protocolConstructor.ok=false, and the documented Firefox diagnostics. Run 26835514645, Firefox 151.0.3 job 79128194446, recorded closeSession.ok=true but failed baton.core.padded-byob only because server.browserCloseReceived=false. Run 26835807876, Firefox 151.0.3 job 79129244033, failed baton.core.padded-byob on closeSessionOk in the full core sequence. Run 26836125845, Firefox 151.0.3 job 79130370168, recorded server.browserCloseReceived=true, so this field is treated as nondeterministic instead of a stable false assertion.",
+      "expect": {
+        "url": "https://127.0.0.1:4433/baton?version=0&baton=251&count=1&padding=0&protocol=optional",
+        "protocolConstructorOk": false,
+        "closeSessionOk": null,
+        "closeSessionTestsInclude": [],
+        "streamWritableOk": null,
+        "streamWritableTestsInclude": [
+          "unidirectional-string-chunk"
+        ],
+        "server": {
+          "closeSessionReceivedMin": 0,
+          "writableBadChunkCloseReceived": null,
+          "browserCloseReceived": null
+        }
+      },
+      "expectRef": "expect.firefox-protocol-optional"
+    },
+    {
+      "scenario": "datagrams.server-empty",
+      "status": "pass",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "reason": "Firefox 151.0.3 in GitHub Actions still uses the protocol=optional endpoint because it does not provide a usable WT-Available-Protocols value in this lane. Keep the empty-datagram scenario on the Firefox data path while not claiming selected WT-Protocol exposure.",
+      "evidence": "GitHub WebTransportBrowser run 26842019982, Firefox job 79151393630, reached datagrams.server-empty but failed before datagram assertions because the scenario URL expected no protocol=optional query parameter.",
+      "expect": {
+        "url": "https://127.0.0.1:4433/baton?version=0&baton=251&count=1&padding=0&datagram=empty&protocol=optional"
+      },
+      "expectRef": "expect.firefox-protocol-optional"
+    },
+    {
+      "scenario": "baton.core.compact-default-reader",
+      "status": "pass",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "reason": "Firefox 151.0.3 did not provide a usable WT-Available-Protocols value in CI, so the Firefox lane uses the baton protocol=optional endpoint and does not claim selected WT-Protocol exposure. The same browser accepted invalid WebTransport protocols constructor inputs instead of throwing, did not send a WT_CLOSE_SESSION capsule after the positive baton exchange, did not reliably complete the dedicated browser-close diagnostic in the full core sequence, does not reliably expose the browser-close diagnostic close reason to pico_baton, showed nondeterministic server visibility for the writable bad-chunk diagnostic close-reason marker, can fail bidirectional writable bad-chunk diagnostic setup with InvalidStateError after sequential sessions, and leaves a post-close datagram write pending past the 3s diagnostic timeout instead of rejecting, so those are recorded as browser API/protocol gaps.",
+      "evidence": "GitHub WebTransportBrowser run 26801289699, Firefox job 79008337128, reached CONNECT path but rejected before wt_baton_accept because no WT-Protocol was selected. Run 26801732536, Firefox job 79009682544, completed the baton exchange but recorded protocolConstructor.ok=false because duplicate, empty, overlong, and non-isomorphic protocols did not throw. Run 26802216963, Firefox job 79011192245, completed Firefox baton smoke and core data exchange but recorded server.closeSessionReceived=0. Run 26802432230, Firefox job 79011866106, recorded server.writableBadChunkCloseReceived=false; run 26802593484, Firefox job 79012384032, recorded the same field true. Run 26802934161, Firefox job 79013469332, failed the compact core scenario because streamWritable reported InvalidStateError on bidirectional-setup. Run 26835514645, Firefox 151.0.3 job 79128194446, recorded closeSession.ok=true but failed baton.core.padded-byob only because server.browserCloseReceived=false. Run 26835807876, Firefox 151.0.3 job 79129244033, failed baton.core.padded-byob on closeSessionOk in the full core sequence. Run 26836125845, Firefox 151.0.3 job 79130370168, recorded server.browserCloseReceived=true, so this field is treated as nondeterministic instead of a stable false assertion. Run 26848668214, Firefox 151.0.3 job 79174926384, completed the compact baton exchange with received=[251,253,255], sent=[252,254,0], datagramsReceived=[252], and postClose.ok=true, then recorded postCloseDatagram.ok=false because datagram-write-after-close timed out after 3000 ms.",
+      "expect": {
+        "url": "https://127.0.0.1:4433/baton?version=0&baton=251&count=1&padding=0&protocol=optional",
+        "protocolConstructorOk": false,
+        "closeSessionOk": null,
+        "closeSessionTestsInclude": [],
+        "postCloseDatagramOk": null,
+        "postCloseDatagramTestsInclude": [
+          "datagram-write-after-close"
+        ],
+        "streamWritableOk": null,
+        "streamWritableTestsInclude": [
+          "unidirectional-string-chunk"
+        ],
+        "server": {
+          "closeSessionReceivedMin": 0,
+          "writableBadChunkCloseReceived": null,
+          "browserCloseReceived": null
+        }
+      },
+      "expectRef": "expect.firefox-protocol-optional"
+    },
+    {
+      "scenario": "baton.core.terminal-wrap-default-reader",
+      "status": "pass",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "reason": "Firefox 151.0.3 in GitHub Actions still uses the protocol=optional endpoint and does not claim selected WT-Protocol exposure. The terminal-wrap scenario should still complete the same WebTransport stream close path, but it inherits the Firefox protocol-constructor, selected-protocol, close-capsule, browser-close diagnostic, browser-close reason, and writable diagnostic caveats as the other positive Firefox baton scenarios.",
+      "expect": {
+        "url": "https://127.0.0.1:4433/baton?version=0&baton=253&count=1&padding=0&protocol=optional",
+        "protocolConstructorOk": false,
+        "closeSessionOk": null,
+        "closeSessionTestsInclude": [],
+        "streamWritableOk": null,
+        "streamWritableTestsInclude": [
+          "unidirectional-string-chunk"
+        ],
+        "server": {
+          "closeSessionReceivedMin": 0,
+          "writableBadChunkCloseReceived": null,
+          "browserCloseReceived": null
+        }
+      },
+      "evidenceRef": "evidence.baton.core.terminal-wrap-default-reader",
+      "expectRef": "expect.firefox-protocol-optional"
+    },
+    {
+      "scenario": "baton.core.terminal-immediate-default-reader",
+      "status": "pass",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "reason": "Firefox 151.0.3 in GitHub Actions still uses the protocol=optional endpoint and does not claim selected WT-Protocol exposure. The terminal-immediate scenario should still complete the same WebTransport stream close path, but it inherits the Firefox protocol-constructor, selected-protocol, close-capsule, browser-close diagnostic, browser-close reason, and writable diagnostic caveats as the other positive Firefox baton scenarios.",
+      "expect": {
+        "url": "https://127.0.0.1:4433/baton?version=0&baton=255&count=1&padding=0&protocol=optional",
+        "protocolConstructorOk": false,
+        "closeSessionOk": null,
+        "closeSessionTestsInclude": [],
+        "streamWritableOk": null,
+        "streamWritableTestsInclude": [
+          "unidirectional-string-chunk"
+        ],
+        "server": {
+          "closeSessionReceivedMin": 0,
+          "writableBadChunkCloseReceived": null,
+          "browserCloseReceived": null
+        }
+      },
+      "evidenceRef": "evidence.baton.core.terminal-wrap-default-reader",
+      "expectRef": "expect.firefox-protocol-optional"
+    },
+    {
+      "scenario": "datagrams.client-empty",
+      "status": "pass",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "reason": "Firefox 151.0.3 in GitHub Actions still uses the protocol=optional endpoint because it does not provide a usable WT-Available-Protocols value in this lane. Keep the client empty-datagram scenario on the Firefox data path while not claiming selected WT-Protocol exposure.",
+      "evidence": "Same selected-protocol constraint as datagrams.optional-unreliable and datagrams.server-empty: GitHub WebTransportBrowser runs 26829426456 and 26842292496 showed Firefox completes the stream/datagram data path through protocol=optional but does not expose a selected WT-Protocol value in this lane.",
+      "expect": {
+        "url": "https://127.0.0.1:4433/baton?version=0&baton=251&count=1&padding=0&client_datagram=empty&protocol=optional"
+      },
+      "expectRef": "expect.firefox-protocol-optional"
+    },
+    {
+      "scenario": "datagrams.server-sized-one",
+      "status": "pass",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "expect": {
+        "url": "https://127.0.0.1:4433/baton?version=0&baton=251&count=1&padding=0&datagram_size=1&protocol=optional"
+      },
+      "reasonRef": "reason.datagrams.server-sized-one",
+      "evidenceRef": "evidence.datagrams.server-sized-one",
+      "expectRef": "expect.firefox-protocol-optional"
+    },
+    {
+      "scenario": "datagrams.server-sized-large",
+      "status": "pass",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "expect": {
+        "url": "https://127.0.0.1:4433/baton?version=0&baton=251&count=1&padding=0&datagram_size=1200&protocol=optional"
+      },
+      "reasonRef": "reason.datagrams.server-sized-one",
+      "evidenceRef": "evidence.datagrams.server-sized-one",
+      "expectRef": "expect.firefox-protocol-optional"
+    },
+    {
+      "scenario": "datagrams.server-repeat-one",
+      "status": "skip",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "reason": "Firefox 151.0.3 in GitHub Actions delivered only a partial repeated one-byte server datagram sequence to the JavaScript readable stream, so this lane does not claim repeated server datagram delivery.",
+      "evidence": "GitHub WebTransportBrowser run 26863007007, Firefox job 79220574196, failed datagrams.server-repeat-one after receiving ten 1-byte datagrams with datagramReceiveMin=16, then timed out after 3000 ms. Chrome and Edge passed the same repeated-datagram batch in that run."
+    },
+    {
+      "scenario": "datagrams.server-repeat-large",
+      "status": "skip",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "reason": "Firefox 151.0.3 in GitHub Actions does not currently claim repeated server datagram delivery. The one-byte repeated row delivered only ten of sixteen datagrams before timeout, so the stricter large repeated row remains unclaimed in this lane.",
+      "evidence": "GitHub WebTransportBrowser run 26863007007, Firefox job 79220574196, failed datagrams.server-repeat-one with datagramLengths=[1,1,1,1,1,1,1,1,1,1] and datagramReceiveMin=16 before the large repeated row could run. Chrome and Edge passed both repeated rows in that run."
+    },
+    {
+      "scenario": "datagrams.server-lossy-one",
+      "status": "pass",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "reason": "Firefox 151.0.3 in GitHub Actions still uses the protocol=optional endpoint because it does not provide a usable WT-Available-Protocols value in this lane. Keep the loss-tolerant server datagram scenario on the Firefox data path while not claiming selected WT-Protocol exposure.",
+      "evidence": "GitHub WebTransportBrowser run 26899009323, Firefox job 79345920041, reached datagrams.server-lossy-one and failed only because the scenario URL expected no protocol=optional query parameter.",
+      "expect": {
+        "url": "https://127.0.0.1:4433/baton?version=0&baton=251&count=1&padding=0&datagram_size=1&datagram_count=64&lossy=1&protocol=optional"
+      },
+      "expectRef": "expect.firefox-protocol-optional"
+    },
+    {
+      "scenario": "datagrams.server-burst-one",
+      "status": "pass",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "reason": "Firefox 151.0.3 in GitHub Actions still uses the protocol=optional endpoint because it does not provide a usable WT-Available-Protocols value in this lane. Keep the 1000-attempt burst server datagram scenario on the Firefox data path while not claiming selected WT-Protocol exposure.",
+      "evidence": "Same selected-protocol constraint as datagrams.server-lossy-one: GitHub WebTransportBrowser run 26899009323, Firefox job 79345920041, showed the Firefox compatibility runner appends protocol=optional to the new C198 server datagram rows.",
+      "expect": {
+        "url": "https://127.0.0.1:4433/baton?version=0&baton=251&count=1&padding=0&datagram_size=1&datagram_count=1000&protocol=optional"
+      },
+      "expectRef": "expect.firefox-protocol-optional"
+    },
+    {
+      "scenario": "datagrams.client-sized-one",
+      "status": "pass",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "reason": "Firefox 151.0.3 in GitHub Actions still uses the protocol=optional endpoint because it does not provide a usable WT-Available-Protocols value in this lane. Keep the exact-size client datagram scenario on the Firefox data path while not claiming selected WT-Protocol exposure.",
+      "expect": {
+        "url": "https://127.0.0.1:4433/baton?version=0&baton=251&count=1&padding=0&client_datagram_size=1&protocol=optional"
+      },
+      "evidenceRef": "evidence.datagrams.server-sized-one",
+      "expectRef": "expect.firefox-protocol-optional"
+    },
+    {
+      "scenario": "datagrams.client-sized-large",
+      "status": "skip",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "reason": "Firefox 151.0.3 in GitHub Actions did not produce a server-observable 1200-byte browser-to-server WebTransport datagram, so this lane does not claim large client datagram delivery.",
+      "evidence": "GitHub WebTransportBrowser run 26862208348, Firefox job 79218182758, failed datagrams.client-sized-large with server.sizedDatagramsReceived=0 after Chrome, Edge, and Safari passed the same exact-size datagram batch."
+    },
+    {
+      "scenario": "datagrams.client-repeat-one",
+      "status": "skip",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "reason": "Firefox 151.0.3 in GitHub Actions does not currently complete repeated one-byte browser-to-server datagram writes, so this lane does not claim repeated client datagram delivery.",
+      "evidence": "GitHub WebTransportBrowser run 26863452355, Firefox job 79221931502, timed out after 30000 ms on datagrams.client-repeat-one with datagramSendMode=length, datagramSendSize=1, datagramSendCount=16 through the protocol=optional compatibility path."
+    },
+    {
+      "scenario": "datagrams.client-repeat-large",
+      "status": "skip",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "reason": "Firefox 151.0.3 in GitHub Actions did not produce a server-observable single 1200-byte browser-to-server WebTransport datagram, so this lane does not claim repeated large client datagram delivery.",
+      "evidence": "GitHub WebTransportBrowser run 26862208348, Firefox job 79218182758, failed datagrams.client-sized-large with server.sizedDatagramsReceived=0 after Chrome, Edge, and Safari passed the same exact-size datagram batch. The repeated large row depends on the same browser-to-server 1200-byte delivery behavior."
+    },
+    {
+      "scenario": "baton.core.short-padded-default-reader",
+      "status": "pass",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "reason": "Firefox 151.0.3 in GitHub Actions still uses the protocol=optional endpoint and does not claim selected WT-Protocol exposure. The short-padded scenario should still complete the same WebTransport stream/datagram data path, but it inherits the Firefox protocol-constructor, selected-protocol, close-capsule, browser-close diagnostic, browser-close reason, and writable diagnostic caveats as the other positive Firefox baton scenarios.",
+      "expect": {
+        "url": "https://127.0.0.1:4433/baton?version=0&baton=251&count=1&padding=63&protocol=optional",
+        "protocolConstructorOk": false,
+        "closeSessionOk": null,
+        "closeSessionTestsInclude": [],
+        "streamWritableOk": null,
+        "streamWritableTestsInclude": [
+          "unidirectional-string-chunk"
+        ],
+        "server": {
+          "closeSessionReceivedMin": 0,
+          "writableBadChunkCloseReceived": null,
+          "browserCloseReceived": null
+        }
+      },
+      "evidenceRef": "evidence.baton.core.short-padded-default-reader",
+      "expectRef": "expect.firefox-protocol-optional"
+    },
+    {
+      "scenario": "baton.core.varint-boundary-padded-default-reader",
+      "status": "pass",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "reason": "Firefox 151.0.3 in GitHub Actions still uses the protocol=optional endpoint and does not claim selected WT-Protocol exposure. The varint-boundary padded scenario should still complete the same WebTransport stream/datagram data path, but it inherits the Firefox protocol-constructor, selected-protocol, close-capsule, browser-close diagnostic, browser-close reason, and writable diagnostic caveats as the other positive Firefox baton scenarios.",
+      "expect": {
+        "url": "https://127.0.0.1:4433/baton?version=0&baton=251&count=1&padding=64&protocol=optional",
+        "protocolConstructorOk": false,
+        "closeSessionOk": null,
+        "closeSessionTestsInclude": [],
+        "streamWritableOk": null,
+        "streamWritableTestsInclude": [
+          "unidirectional-string-chunk"
+        ],
+        "server": {
+          "closeSessionReceivedMin": 0,
+          "writableBadChunkCloseReceived": null,
+          "browserCloseReceived": null
+        }
+      },
+      "evidenceRef": "evidence.baton.core.short-padded-default-reader",
+      "expectRef": "expect.firefox-protocol-optional"
+    },
+    {
+      "scenario": "baton.core.medium-padded-default-reader",
+      "status": "pass",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "reason": "Firefox 151.0.3 in GitHub Actions still uses the protocol=optional endpoint and does not claim selected WT-Protocol exposure. The medium-padded scenario should still complete the same WebTransport stream/datagram data path, but it inherits the Firefox protocol-constructor, selected-protocol, close-capsule, browser-close diagnostic, browser-close reason, and writable diagnostic caveats as the other positive Firefox baton scenarios.",
+      "evidence": "GitHub WebTransportBrowser run 26830637957, Firefox job passed after the standalone smoke stopped gating on the already documented bidirectional bad-chunk diagnostic. Earlier Firefox positive-path evidence is recorded on baton.core.compact-default-reader and datagrams.optional-unreliable. Run 26835514645, Firefox 151.0.3 job 79128194446, recorded closeSession.ok=true but failed baton.core.padded-byob only because server.browserCloseReceived=false. Run 26835807876, Firefox 151.0.3 job 79129244033, failed baton.core.padded-byob on closeSessionOk in the full core sequence. Run 26836125845, Firefox 151.0.3 job 79130370168, recorded server.browserCloseReceived=true, so this field is treated as nondeterministic instead of a stable false assertion.",
+      "expect": {
+        "url": "https://127.0.0.1:4433/baton?version=0&baton=251&count=1&padding=1200&protocol=optional",
+        "protocolConstructorOk": false,
+        "closeSessionOk": null,
+        "closeSessionTestsInclude": [],
+        "streamWritableOk": null,
+        "streamWritableTestsInclude": [
+          "unidirectional-string-chunk"
+        ],
+        "server": {
+          "closeSessionReceivedMin": 0,
+          "writableBadChunkCloseReceived": null,
+          "browserCloseReceived": null
+        }
+      },
+      "expectRef": "expect.firefox-protocol-optional"
+    },
+    {
+      "scenario": "baton.stream.max-padded-default-reader",
+      "status": "pass",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "reason": "Firefox 151.0.3 in GitHub Actions still uses the protocol=optional endpoint and does not claim selected WT-Protocol exposure. The max-padded baton stream row should still exercise the same one-lane stream/datagram data path while extending the padded stream payload size to the current server maximum.",
+      "evidence": "Same selected-protocol and positive-path caveats as baton.core.medium-padded-default-reader: GitHub WebTransportBrowser run 26830637957 passed after the standalone smoke stopped gating on the documented bidirectional bad-chunk diagnostic, while earlier Firefox positive-path evidence on baton.core.compact-default-reader and datagrams.optional-unreliable shows the protocol=optional compatibility URL and selected-protocol gap.",
+      "expect": {
+        "url": "https://127.0.0.1:4433/baton?version=0&baton=251&count=1&padding=16383&protocol=optional"
+      },
+      "expectRef": "expect.firefox-protocol-optional"
+    },
+    {
+      "scenario": "streams.large-bidi-echo-10mb",
+      "status": "pass",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "reason": "Firefox 151.0.3 in GitHub Actions still uses the protocol=optional endpoint because it does not provide a usable WT-Available-Protocols value in this lane. Keep the 10MB bidirectional stream row on the Firefox data path while not claiming selected WT-Protocol exposure.",
+      "evidence": "GitHub WebTransportBrowser run 26904158856, Firefox job 79364305271, reached streams.large-bidi-echo-10mb and failed only because the scenario URL expected no protocol=optional query parameter.",
+      "expect": {
+        "url": "https://127.0.0.1:4433/baton?version=0&stream=client-bidi-echo&stream_size=10485760&stream_count=1&protocol=optional"
+      },
+      "expectRef": "expect.firefox-protocol-optional"
+    },
+    {
+      "scenario": "streams.large-uni-reply-10mb",
+      "status": "pass",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "reason": "Firefox 151.0.3 in GitHub Actions still uses the protocol=optional endpoint because it does not provide a usable WT-Available-Protocols value in this lane. Keep the 10MB unidirectional stream/reply row on the Firefox data path while not claiming selected WT-Protocol exposure.",
+      "expect": {
+        "url": "https://127.0.0.1:4433/baton?version=0&stream=client-uni-reply&stream_size=10485760&stream_count=1&protocol=optional"
+      },
+      "evidenceRef": "evidence.streams.large-uni-reply-10mb",
+      "expectRef": "expect.firefox-protocol-optional"
+    },
+    {
+      "scenario": "streams.fin-empty-bidi",
+      "status": "pass",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "reason": "Firefox 151.0.3 in GitHub Actions still uses the protocol=optional endpoint because it does not provide a usable WT-Available-Protocols value in this lane. Keep the zero-byte bidirectional FIN row on the Firefox data path while not claiming selected WT-Protocol exposure.",
+      "expect": {
+        "url": "https://127.0.0.1:4433/baton?version=0&stream=client-bidi-echo&stream_size=0&stream_count=1&protocol=optional"
+      },
+      "evidenceRef": "evidence.streams.large-uni-reply-10mb",
+      "expectRef": "expect.firefox-protocol-optional"
+    },
+    {
+      "scenario": "streams.fin-empty-uni",
+      "status": "pass",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "reason": "Firefox 151.0.3 in GitHub Actions still uses the protocol=optional endpoint and does not expose the incoming zero-byte unidirectional reply as a successful readable completion. Keep the row active to prove the server receives and sends the zero-byte FIN, but do not claim Firefox stable browser-side completion for this FIN-only unidirectional reply path.",
+      "evidence": "GitHub WebTransportBrowser run 26908158085, Firefox job 79378650235, reached streams.fin-empty-uni through protocol=optional, sent the zero-byte browser unidirectional stream, and then reported WebTransportError: remote WebTransport close. The server summary still proved connectAccepted=1, optionalProtocolAccepted=1, streamTestFinReceived=1, streamTestFinSent=1, and zero bytes both directions.",
+      "expect": {
+        "ok": false,
+        "url": "https://127.0.0.1:4433/baton?version=0&stream=client-uni-reply&stream_size=0&stream_count=1&protocol=optional",
+        "streamFinReceived": 0,
+        "eventsInclude": [
+          "ready",
+          "stream sent 0"
+        ],
+        "eventsExclude": [
+          "stream received 0 on client-uni-reply-0",
+          "closed"
+        ],
+        "errorIncludes": "WebTransportError",
+        "server": {
+          "streamTestBytesReceived": 0,
+          "streamTestBytesSent": 0,
+          "streamTestFinReceived": 1,
+          "streamTestFinSent": 1
+        }
+      },
+      "expectRef": "expect.firefox-protocol-optional"
+    },
+    {
+      "scenario": "streams.server-open-uni-zero",
+      "status": "pass",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "reason": "Firefox 151.0.3 in GitHub Actions still uses the protocol=optional endpoint because it does not provide a usable WT-Available-Protocols value in this lane. Keep the server-opened zero-byte unidirectional stream row on the Firefox data path and preserve the server FIN assertion, but do not claim browser-readable completion for this Firefox stable path.",
+      "evidence": "GitHub WebTransportBrowser run 26910534966, Firefox job 79387042950, reached streams.server-open-uni-zero through protocol=optional. The browser reported WebTransportError: WebTransport connection rejected before delivering the server-opened stream, while the server summary proved connectAccepted=1, optionalProtocolAccepted=1, streamTestFinSent=1, and zero stream bytes sent.",
+      "expect": {
+        "ok": false,
+        "url": "https://127.0.0.1:4433/baton?version=0&stream=server-uni&stream_size=0&stream_count=1&protocol=optional",
+        "streamFinReceived": 0,
+        "eventsInclude": [
+          "connecting"
+        ],
+        "eventsExclude": [
+          "ready",
+          "stream received 0 on server-uni-0",
+          "closed"
+        ],
+        "errorIncludes": "WebTransportError",
+        "server": {
+          "streamTestFinReceived": null,
+          "streamTestFinReceivedMin": 0
+        }
+      },
+      "expectRef": "expect.firefox-protocol-optional"
+    },
+    {
+      "scenario": "streams.server-open-bidi-zero",
+      "status": "pass",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "reason": "Firefox 151.0.3 in GitHub Actions still uses the protocol=optional endpoint because it does not provide a usable WT-Available-Protocols value in this lane. Keep the server-opened zero-byte bidirectional stream row on the Firefox data path and preserve the server FIN assertion, but do not claim browser-readable completion for this Firefox stable path.",
+      "evidence": "GitHub WebTransportBrowser run 26911316618, Firefox job 79389755617, reached streams.server-open-bidi-zero through protocol=optional. The browser reported WebTransportError: WebTransport connection rejected before delivering the server-opened stream, while the server summary proved connectAccepted=1, optionalProtocolAccepted=1, streamTestFinSent=1, and zero stream bytes sent.",
+      "expect": {
+        "ok": false,
+        "url": "https://127.0.0.1:4433/baton?version=0&stream=server-bidi&stream_size=0&stream_count=1&protocol=optional",
+        "streamFinSent": 0,
+        "streamFinReceived": 0,
+        "eventsInclude": [
+          "connecting"
+        ],
+        "eventsExclude": [
+          "ready",
+          "stream sent 0 on server-bidi-0-reply",
+          "stream received 0 on server-bidi-0",
+          "closed"
+        ],
+        "errorIncludes": "WebTransportError",
+        "server": {
+          "streamTestFinReceived": null,
+          "streamTestFinReceivedMin": 0
+        }
+      },
+      "expectRef": "expect.firefox-protocol-optional"
+    },
+    {
+      "scenario": "baton.core.two-lane-compact-default-reader",
+      "status": "skip",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "reason": "Firefox 151.0.3 in GitHub Actions still uses the protocol=optional endpoint and does not claim selected WT-Protocol exposure. On the two-lane compact endpoint, Firefox completed one full stream/datagram baton lane but did not deliver the second concurrent server-opened lane before the harness timeout, so this lane does not currently claim concurrent two-lane browser E2E conformance for Firefox.",
+      "evidence": "GitHub WebTransportBrowser run 26833011127, Firefox job 79119269606, logged url=https://127.0.0.1:4433/baton?version=0&baton=251&count=2&padding=0&protocol=optional with received=[251,253,255], sent=[252,254,0], datagramsReceived=[252], closeSessionReceived=1, and timeout after 30000 ms while pico_baton was still waiting for the second lane. Chrome and Edge passed the same two-lane scenario in that run."
+    },
+    {
+      "scenario": "baton.core.four-lane-compact-default-reader",
+      "status": "skip",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "reason": "Firefox 151.0.3 in GitHub Actions does not currently claim concurrent multi-lane browser E2E conformance. The two-lane compact scenario is already skipped because Firefox completed only one full lane before timeout; keep the stricter four-lane scenario present for other browsers but skipped in the Firefox lane.",
+      "evidence": "GitHub WebTransportBrowser run 26833011127, Firefox job 79119269606, timed out on the two-lane compact endpoint after one complete lane. In run 26847131054, Firefox job 79169550196 reached baton.core.four-lane-compact-default-reader through the Firefox protocol=optional compatibility path and failed before concurrency assertions only because this expected-results entry did not yet exist. Chrome job 79169550213 and Edge job 79169550278 passed the four-lane scenario in that run."
+    },
+    {
+      "scenario": "baton.stream.sixteen-lane-compact-default-reader",
+      "status": "skip",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "reason": "Firefox 151.0.3 in GitHub Actions does not currently claim concurrent multi-lane browser E2E conformance. The two-lane compact row already timed out after one complete lane, so the stricter sixteen-lane row is present for browsers that pass it but not claimed in the Firefox lane.",
+      "evidence": "GitHub WebTransportBrowser run 26833011127, Firefox job 79119269606, timed out on baton.core.two-lane-compact-default-reader after one complete lane. The existing four-lane skip records the same concurrency limitation for the stricter four-lane row; sixteen lanes exercise the same server/browser stream scheduling behavior at a higher count."
+    },
+    {
+      "scenario": "streams.endpoint-echo-bidi",
+      "status": "pass",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "reason": "Firefox 151.0.3 in GitHub Actions still uses the protocol=optional endpoint because it does not provide a usable WT-Available-Protocols value in this lane. Keep the dedicated bidirectional stream endpoint on the Firefox data path while not claiming selected WT-Protocol exposure.",
+      "evidence": "Same selected-protocol constraint as the C201 stream rows: GitHub WebTransportBrowser run 26913123737 passed Firefox after the stream-mode compatibility runner appended protocol=optional to C201 stream paths, and run-firefox.mjs applies the same compatibility endpoint rule to stream-mode rows.",
+      "expect": {
+        "url": "https://127.0.0.1:4433/wt/stream/echo-bidi?stream_size=64&stream_count=1&protocol=optional"
+      },
+      "expectRef": "expect.firefox-protocol-optional"
+    },
+    {
+      "scenario": "streams.endpoint-echo-uni",
+      "status": "pass",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "reason": "Firefox 151.0.3 in GitHub Actions still uses the protocol=optional endpoint because it does not provide a usable WT-Available-Protocols value in this lane. Keep the dedicated unidirectional stream endpoint on the Firefox data path while not claiming selected WT-Protocol exposure.",
+      "evidence": "Same selected-protocol constraint as streams.endpoint-echo-bidi and the C201 client-uni-reply rows; the runner compatibility rule appends protocol=optional for Firefox stream-mode rows.",
+      "expect": {
+        "url": "https://127.0.0.1:4433/wt/stream/echo-uni?stream_size=64&stream_count=1&protocol=optional"
+      },
+      "expectRef": "expect.firefox-protocol-optional"
+    },
+    {
+      "scenario": "streams.endpoint-large-bidi-10mb",
+      "status": "pass",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "reason": "Firefox 151.0.3 in GitHub Actions still uses the protocol=optional endpoint because it does not provide a usable WT-Available-Protocols value in this lane. Keep the dedicated 10MB bidirectional stream endpoint on the Firefox data path while not claiming selected WT-Protocol exposure.",
+      "evidence": "Same data path as streams.large-bidi-echo-10mb, which passed in Firefox in WebTransportBrowser run 26913123737 with protocol=optional compatibility.",
+      "expect": {
+        "url": "https://127.0.0.1:4433/wt/stream/large-bidi?stream_size=10485760&stream_count=1&protocol=optional"
+      },
+      "expectRef": "expect.firefox-protocol-optional"
+    },
+    {
+      "scenario": "streams.endpoint-large-uni-10mb",
+      "status": "pass",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "reason": "Firefox 151.0.3 in GitHub Actions still uses the protocol=optional endpoint because it does not provide a usable WT-Available-Protocols value in this lane. Keep the dedicated 10MB unidirectional stream endpoint on the Firefox data path while not claiming selected WT-Protocol exposure.",
+      "evidence": "Same data path as streams.large-uni-reply-10mb, which passed in Firefox in WebTransportBrowser run 26913123737 with protocol=optional compatibility.",
+      "expect": {
+        "url": "https://127.0.0.1:4433/wt/stream/large-uni?stream_size=10485760&stream_count=1&protocol=optional"
+      },
+      "expectRef": "expect.firefox-protocol-optional"
+    },
+    {
+      "scenario": "streams.endpoint-fin-empty-bidi",
+      "status": "pass",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "reason": "Firefox 151.0.3 in GitHub Actions still uses the protocol=optional endpoint because it does not provide a usable WT-Available-Protocols value in this lane. Keep the dedicated zero-byte bidirectional FIN endpoint on the Firefox data path while not claiming selected WT-Protocol exposure.",
+      "evidence": "Same data path as streams.fin-empty-bidi, which passed in Firefox in WebTransportBrowser run 26913123737 with protocol=optional compatibility.",
+      "expect": {
+        "url": "https://127.0.0.1:4433/wt/stream/fin-empty-bidi?stream_size=0&stream_count=1&protocol=optional"
+      },
+      "expectRef": "expect.firefox-protocol-optional"
+    },
+    {
+      "scenario": "streams.endpoint-fin-empty-uni",
+      "status": "pass",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "reason": "Firefox 151.0.3 in GitHub Actions still uses the protocol=optional endpoint and does not expose the incoming zero-byte unidirectional reply as a successful readable completion. Keep the dedicated row active to prove the server receives and sends the zero-byte FIN, but do not claim Firefox stable browser-side completion for this FIN-only unidirectional reply path.",
+      "evidence": "Same data path as streams.fin-empty-uni, which WebTransportBrowser run 26908158085 showed fails browser-readable completion while preserving server FIN/byte assertions; run 26913123737 passed that expected-result classification.",
+      "expect": {
+        "ok": false,
+        "url": "https://127.0.0.1:4433/wt/stream/fin-empty-uni?stream_size=0&stream_count=1&protocol=optional",
+        "streamFinReceived": 0,
+        "eventsInclude": [
+          "ready",
+          "stream sent 0"
+        ],
+        "eventsExclude": [
+          "stream received 0 on client-uni-reply-0",
+          "closed"
+        ],
+        "errorIncludes": "WebTransportError",
+        "server": {
+          "streamTestBytesReceived": 0,
+          "streamTestBytesSent": 0,
+          "streamTestFinReceived": 1,
+          "streamTestFinSent": 1
+        }
+      },
+      "expectRef": "expect.firefox-protocol-optional"
+    },
+    {
+      "scenario": "streams.endpoint-server-open-uni-zero",
+      "status": "pass",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "reason": "Firefox 151.0.3 in GitHub Actions still uses the protocol=optional endpoint because it does not provide a usable WT-Available-Protocols value in this lane. Keep the dedicated server-opened zero-byte unidirectional stream endpoint on the Firefox data path and preserve the server FIN assertion, but do not claim browser-readable completion for this Firefox stable path.",
+      "evidence": "Same data path as streams.server-open-uni-zero, which WebTransportBrowser run 26910534966 showed reports WebTransportError before delivering the server-opened stream while the server proves optional endpoint acceptance and a zero-byte FIN; run 26913123737 passed that expected-result classification.",
+      "expect": {
+        "ok": false,
+        "url": "https://127.0.0.1:4433/wt/stream/server-open-uni?stream_size=0&stream_count=1&protocol=optional",
+        "streamFinReceived": 0,
+        "eventsInclude": [
+          "connecting"
+        ],
+        "eventsExclude": [
+          "ready",
+          "stream received 0 on server-uni-0",
+          "closed"
+        ],
+        "errorIncludes": "WebTransportError",
+        "server": {
+          "streamTestFinReceived": null,
+          "streamTestFinReceivedMin": 0
+        }
+      },
+      "expectRef": "expect.firefox-protocol-optional"
+    },
+    {
+      "scenario": "streams.endpoint-server-open-bidi-zero",
+      "status": "pass",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "reason": "Firefox 151.0.3 in GitHub Actions still uses the protocol=optional endpoint because it does not provide a usable WT-Available-Protocols value in this lane. Keep the dedicated server-opened zero-byte bidirectional stream endpoint on the Firefox data path and preserve the server FIN assertion, but do not claim browser-readable completion for this Firefox stable path.",
+      "evidence": "Same data path as streams.server-open-bidi-zero, which WebTransportBrowser runs 26911316618 and 26912514984 showed reports WebTransportError before delivering the server-opened stream while preserving server-opened FIN evidence; run 26913123737 passed that expected-result classification.",
+      "expect": {
+        "ok": false,
+        "url": "https://127.0.0.1:4433/wt/stream/server-open-bidi?stream_size=0&stream_count=1&protocol=optional",
+        "streamFinSent": 0,
+        "streamFinReceived": 0,
+        "eventsInclude": [
+          "connecting"
+        ],
+        "eventsExclude": [
+          "ready",
+          "stream sent 0 on server-bidi-0-reply",
+          "stream received 0 on server-bidi-0",
+          "closed"
+        ],
+        "errorIncludes": "WebTransportError",
+        "server": {
+          "streamTestFinReceived": null,
+          "streamTestFinReceivedMin": 0
+        }
+      },
+      "expectRef": "expect.firefox-protocol-optional"
+    },
+    {
+      "scenario": "reset.browser-abort-bidi",
+      "status": "pass",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "expect": {
+        "url": "https://127.0.0.1:4433/wt/reset/browser-abort-bidi?stream_size=1&stream_count=1&protocol=optional"
+      },
+      "reasonRef": "reason.reset.browser-abort-bidi",
+      "evidenceRef": "evidence.reset.browser-abort-bidi",
+      "expectRef": "expect.firefox-protocol-optional"
+    },
+    {
+      "scenario": "reset.browser-abort-uni",
+      "status": "pass",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "expect": {
+        "url": "https://127.0.0.1:4433/wt/reset/browser-abort-uni?stream_size=1&stream_count=1&protocol=optional"
+      },
+      "reasonRef": "reason.reset.browser-abort-bidi",
+      "evidenceRef": "evidence.reset.browser-abort-bidi",
+      "expectRef": "expect.firefox-protocol-optional"
+    },
+    {
+      "scenario": "reset.browser-cancel-incoming-bidi",
+      "status": "pass",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "reason": "Firefox 151.0.3 in GitHub Actions still uses the protocol=optional endpoint for stream-mode WebTransport rows because it does not provide a usable WT-Available-Protocols value in this lane. It reads the incoming bidirectional stream and accepts ReadableStream.cancel(), but does not produce server-observed STOP_SENDING, so keep the data-path evidence while not claiming successful STOP/cancel behavior for this Firefox stable path.",
+      "evidence": "WebTransportBrowser run 26916189865, Firefox job 79406303211, showed Firefox 151.0.3 reached reset.browser-cancel-incoming-bidi, reported events 'ready', 'stream read before cancel bidi', and 'stream canceled incoming bidi', then timed out waiting for transport.closed; the server summary showed optionalProtocolAccepted=1, streamTestBytesSent=1048576, streamBytesReceived=1383 in the browser result, but stopSendingReceived=0 and stopSendingAppError123=0.",
+      "expect": {
+        "url": "https://127.0.0.1:4433/wt/reset/browser-cancel-incoming-bidi?stream_size=1048576&stream_count=1&protocol=optional",
+        "eventsInclude": [
+          "ready",
+          "stream read before cancel bidi",
+          "stream canceled incoming bidi"
+        ],
+        "server": {
+          "stopSendingReceivedMin": null,
+          "stopSendingAppError123Min": null
+        }
+      },
+      "expectRef": "expect.firefox-protocol-optional"
+    },
+    {
+      "scenario": "reset.browser-cancel-incoming-uni",
+      "status": "pass",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "reason": "Firefox 151.0.3 in GitHub Actions still uses the protocol=optional endpoint for stream-mode WebTransport rows because it does not provide a usable WT-Available-Protocols value in this lane. Treat the incoming unidirectional cancel row as the same Firefox stable incoming ReadableStream.cancel browser gap as the bidirectional row until a later browser version proves STOP_SENDING propagation.",
+      "evidence": "Same incoming Firefox ReadableStream.cancel path as reset.browser-cancel-incoming-bidi. WebTransportBrowser run 26916189865, Firefox job 79406303211, proved the bidirectional incoming-cancel row read stream data and accepted cancel but did not produce transport.closed or server STOP_SENDING; this unidirectional row is classified with the same browser-version caveat so the C203 incoming-cancel family remains batched.",
+      "expect": {
+        "url": "https://127.0.0.1:4433/wt/reset/browser-cancel-incoming-uni?stream_size=1048576&stream_count=1&protocol=optional",
+        "eventsInclude": [
+          "ready",
+          "stream read before cancel uni",
+          "stream canceled incoming uni"
+        ],
+        "server": {
+          "stopSendingReceivedMin": null,
+          "stopSendingAppError123Min": null
+        }
+      },
+      "expectRef": "expect.firefox-protocol-optional"
+    },
+    {
+      "scenario": "reset.server-reset-bidi",
+      "status": "pass",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "expect": {
+        "url": "https://127.0.0.1:4433/wt/reset/server-reset-bidi?code=123&stream_count=1&protocol=optional"
+      },
+      "reasonRef": "reason.reset.server-reset-bidi",
+      "evidenceRef": "evidence.reset.server-reset-bidi",
+      "expectRef": "expect.firefox-protocol-optional"
+    },
+    {
+      "scenario": "reset.server-reset-uni",
+      "status": "pass",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "expect": {
+        "url": "https://127.0.0.1:4433/wt/reset/server-reset-uni?code=123&stream_count=1&protocol=optional"
+      },
+      "reasonRef": "reason.reset.server-reset-bidi",
+      "evidenceRef": "evidence.reset.server-reset-bidi",
+      "expectRef": "expect.firefox-protocol-optional"
+    },
+    {
+      "scenario": "reset.server-stop-bidi",
+      "status": "pass",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "expect": {
+        "url": "https://127.0.0.1:4433/wt/reset/server-stop-bidi?code=123&stream_count=1&protocol=optional"
+      },
+      "reasonRef": "reason.reset.server-stop-bidi",
+      "evidenceRef": "evidence.reset.server-reset-bidi",
+      "expectRef": "expect.firefox-protocol-optional"
+    },
+    {
+      "scenario": "reset.server-stop-uni",
+      "status": "pass",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "expect": {
+        "url": "https://127.0.0.1:4433/wt/reset/server-stop-uni?code=123&stream_count=1&protocol=optional"
+      },
+      "reasonRef": "reason.reset.server-stop-bidi",
+      "evidenceRef": "evidence.reset.server-reset-bidi",
+      "expectRef": "expect.firefox-protocol-optional"
+    },
+    {
+      "scenario": "close.server-immediate",
+      "status": "pass",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "reason": "Firefox 151.0.3 in GitHub Actions still uses the protocol=optional endpoint for stream-mode WebTransport rows because it does not provide a usable WT-Available-Protocols value in this lane. Keep the immediate server-close row on the lifecycle path while not claiming selected WT-Protocol exposure.",
+      "expect": {
+        "url": "https://127.0.0.1:4433/wt/close/server-immediate?code=0&reason=&protocol=optional"
+      },
+      "evidenceRef": "evidence.close.server-immediate",
+      "expectRef": "expect.firefox-protocol-optional"
+    },
+    {
+      "scenario": "close.server-after-ready",
+      "status": "pass",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "reason": "Firefox 151.0.3 in GitHub Actions still uses the protocol=optional endpoint for stream-mode WebTransport rows because it does not provide a usable WT-Available-Protocols value in this lane. Keep the triggered server-close row on the lifecycle data path while not claiming selected WT-Protocol exposure.",
+      "expect": {
+        "url": "https://127.0.0.1:4433/wt/close/server-after-ready?code=42&reason=done&protocol=optional"
+      },
+      "evidenceRef": "evidence.close.server-immediate",
+      "expectRef": "expect.firefox-protocol-optional"
+    },
+    {
+      "scenario": "close.browser-close",
+      "status": "pass",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "reason": "Firefox 151.0.3 in GitHub Actions still uses the protocol=optional endpoint for stream-mode WebTransport rows because it does not provide a usable WT-Available-Protocols value in this lane. Browser-originated close-capsule observation is also nondeterministic in this Firefox stable lane, so keep the browser close API path without requiring the server to observe the close capsule.",
+      "expect": {
+        "url": "https://127.0.0.1:4433/wt/close/browser-close?protocol=optional",
+        "server": {
+          "closeSessionReceivedMin": null,
+          "closeSessionReceivedError42Min": null
+        }
+      },
+      "evidenceRef": "evidence.close.browser-close",
+      "expectRef": "expect.firefox-protocol-optional"
+    },
+    {
+      "scenario": "close.browser-close-long-reason",
+      "status": "pass",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "reason": "Firefox 151.0.3 in GitHub Actions still uses the protocol=optional endpoint for stream-mode WebTransport rows because it does not provide a usable WT-Available-Protocols value in this lane. Browser-originated close-capsule observation is also nondeterministic in this Firefox stable lane, so keep the long-reason close API path without requiring the server to observe the close capsule.",
+      "expect": {
+        "url": "https://127.0.0.1:4433/wt/close/browser-close-long-reason?protocol=optional",
+        "server": {
+          "closeSessionReceivedMin": null,
+          "closeSessionReceivedError42Min": null
+        }
+      },
+      "evidenceRef": "evidence.close.browser-close",
+      "expectRef": "expect.firefox-protocol-optional"
+    },
+    {
+      "scenario": "close.server-close-long-reason",
+      "status": "pass",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "reason": "Firefox 151.0.3 in GitHub Actions still uses the protocol=optional endpoint for stream-mode WebTransport rows because it does not provide a usable WT-Available-Protocols value in this lane. Keep the long-reason server-close row on the lifecycle path while not claiming selected WT-Protocol exposure.",
+      "expect": {
+        "url": "https://127.0.0.1:4433/wt/close/server-close-long-reason?protocol=optional"
+      },
+      "evidenceRef": "evidence.close.server-immediate",
+      "expectRef": "expect.firefox-protocol-optional"
+    },
+    {
+      "scenario": "close.fin-no-capsule",
+      "status": "pass",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "reason": "Firefox 151.0.3 in GitHub Actions still uses the protocol=optional endpoint for stream-mode WebTransport rows because it does not provide a usable WT-Available-Protocols value in this lane. Keep the no-close-capsule FIN row on the lifecycle path while not claiming selected WT-Protocol exposure.",
+      "expect": {
+        "url": "https://127.0.0.1:4433/wt/close/fin-no-capsule?protocol=optional"
+      },
+      "evidenceRef": "evidence.close.server-immediate",
+      "expectRef": "expect.firefox-protocol-optional"
+    },
+    {
+      "scenario": "drain.server-drain",
+      "status": "skip",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "reason": "Firefox 151.0.3 in GitHub Actions still uses the protocol=optional endpoint for stream-mode WebTransport rows and does not provide stable server-observable WT_DRAIN_SESSION behavior in this lane. Do not claim the Firefox stable drain row until the browser lane can show server drain emission.",
+      "evidence": "GitHub WebTransportBrowser run 26923501085, Firefox job 79428746844, reached drain.server-drain and failed because server.lifecycleTriggerReceived was 0 instead of at least 1. Follow-up run 26923887484, Firefox job 79429909327, reached the same row after omitting the lifecycle trigger counter and failed because server.drainSessionSent was 0 instead of at least 1."
+    },
+    {
+      "scenario": "drain.server-drain-then-close",
+      "status": "skip",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "reason": "Firefox 151.0.3 in GitHub Actions shares the same WT_DRAIN_SESSION compatibility limitation as drain.server-drain, so this lane does not claim the combined drain-then-close row.",
+      "evidence": "GitHub WebTransportBrowser runs 26923501085 and 26923887484 failed the preceding Firefox drain.server-drain row before this adjacent drain-then-close scenario could run. Both rows use the same Firefox protocol=optional stream-mode endpoint and server WT_DRAIN_SESSION emission path."
+    },
+    {
+      "scenario": "session-gone.active-streams",
+      "status": "pass",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "reason": "Firefox 151.0.3 in GitHub Actions still uses the protocol=optional endpoint for stream-mode WebTransport rows because it does not provide a usable WT-Available-Protocols value in this lane. Keep the session-gone active-stream row on the lifecycle data path while not claiming selected WT-Protocol exposure.",
+      "expect": {
+        "url": "https://127.0.0.1:4433/wt/session-gone/active-streams?code=42&reason=done&protocol=optional"
+      },
+      "evidenceRef": "evidence.close.server-immediate",
+      "expectRef": "expect.firefox-protocol-optional"
+    },
+    {
+      "scenario": "session-gone.datagram-after-close",
+      "status": "pass",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "reason": "Firefox 151.0.3 in GitHub Actions still uses the protocol=optional endpoint for stream-mode WebTransport rows because it does not provide a usable WT-Available-Protocols value in this lane. Firefox can time out datagram writer rejection after session close in this stable lane, so keep the lifecycle close path without claiming post-close datagram writer timing.",
+      "evidence": "Same Firefox stream-mode compatibility path as the C201/C202 stream rows and C205 reset/STOP rows, which passed through protocol=optional in WebTransportBrowser runs 26913123737, 26914421909, 26917564358, and 26920504719. Firefox run 26848668214 recorded postCloseDatagram.ok=false because datagram-write-after-close timed out after 3000 ms after an otherwise successful positive WebTransport exchange.",
+      "expect": {
+        "url": "https://127.0.0.1:4433/wt/session-gone/datagram-after-close?code=42&reason=done&protocol=optional",
+        "postCloseDatagramOk": null,
+        "postCloseDatagramTestsInclude": [
+          "datagram-write-after-close"
+        ]
+      },
+      "expectRef": "expect.firefox-protocol-optional"
+    },
+    {
+      "scenario": "session-gone.new-stream-after-close",
+      "status": "pass",
+      "category": "browser-missing",
+      "browserVersion": "151.0.3",
+      "platform": "linux",
+      "reason": "Firefox 151.0.3 in GitHub Actions still uses the protocol=optional endpoint for stream-mode WebTransport rows because it does not provide a usable WT-Available-Protocols value in this lane. Keep the post-close new-stream row on the lifecycle data path while not claiming selected WT-Protocol exposure.",
+      "expect": {
+        "url": "https://127.0.0.1:4433/wt/session-gone/new-stream-after-close?code=42&reason=done&protocol=optional"
+      },
+      "evidenceRef": "evidence.close.server-immediate",
+      "expectRef": "expect.firefox-protocol-optional"
+    }
+  ]
+}

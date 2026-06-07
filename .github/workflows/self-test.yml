@@ -1,0 +1,79 @@
+---
+name: "H3BrowserConformance"
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  manifest-validation:
+    name: Manifest and expected-result validation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout h3browserconformance
+        uses: actions/checkout@v5
+
+      - name: Validate browser scenario manifests
+        run: |
+          npx -y node@22 e2e/runners/run-browser.mjs list --json
+          npx -y node@22 e2e/runners/run-browser.mjs support --json
+          npx -y node@22 e2e/runners/run-browser.mjs coverage --json
+
+      - name: Validate WPT expected manifests
+        run: |
+          npx -y node@22 wpt/run-wpt.mjs list --json
+          npx -y node@22 wpt/run-wpt.mjs list --expected wpt/expected/chrome-stable.json --json
+          npx -y node@22 wpt/run-wpt.mjs list --expected wpt/expected/edge-stable.json --json
+          npx -y node@22 wpt/run-wpt.mjs list --expected wpt/expected/firefox-stable.json --json
+          npx -y node@22 wpt/run-wpt.mjs list --expected wpt/expected/safari-stable.json --json
+
+      - name: Validate WPT invocation wiring
+        run: |
+          npx -y node@22 wpt/run-wpt.mjs run \
+            --wpt-root wpt/fixtures/fake-wpt \
+            --browser chrome \
+            --test constructor.https.sub.any.js \
+            --dry-run
+
+  pico-baton-smoke:
+    name: pico_baton server smoke
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout h3browserconformance
+        uses: actions/checkout@v5
+        with:
+          path: h3browserconformance
+
+      - name: Checkout picoquic
+        uses: actions/checkout@v5
+        with:
+          repository: private-octopus/picoquic
+          path: picoquic
+          submodules: "recursive"
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libssl-dev openssl
+
+      - name: Build pico_baton
+        run: |
+          cmake -S picoquic -B picoquic/build -DPICOQUIC_FETCH_PTLS:BOOL=ON
+          cmake --build picoquic/build -j$(nproc) --target pico_baton
+
+      - name: Smoke-test pico_baton adapter
+        run: |
+          npx -y node@22 h3browserconformance/wpt/run-wpt.mjs server-smoke \
+            --picoquic-root "$PWD/picoquic" \
+            --baton-bin "$PWD/picoquic/build/pico_baton"
+

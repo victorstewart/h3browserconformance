@@ -1,0 +1,23 @@
+{
+  "name": "h3browserconformance",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Browser and WPT-oriented WebTransport-over-HTTP/3 conformance harnesses.",
+  "scripts": {
+    "e2e:list": "node e2e/runners/run-browser.mjs list --json",
+    "e2e:support": "node e2e/runners/run-browser.mjs support --json",
+    "e2e:coverage": "node e2e/runners/run-browser.mjs coverage --json",
+    "wpt:list": "node wpt/run-wpt.mjs list --json",
+    "wpt:server-smoke": "node wpt/run-wpt.mjs server-smoke",
+    "chrome:smoke": "node browser/run-chrome.mjs",
+    "edge:smoke": "node browser/run-chrome.mjs",
+    "firefox:smoke": "node browser/run-firefox.mjs",
+    "safari:smoke": "node browser/run-safari.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "license": "MIT"
+}
+

@@ -1,0 +1,386 @@
+{
+  "browser": "safari",
+  "channel": "stable",
+  "platform": "macOS",
+  "references": {
+    "reason.baton.core.terminal-wrap-default-reader": {
+      "reason": "Safari stable throws NotSupportedError for allowPooling with serverCertificateHashes, matching the W3C constructor requirement, but Safari 26.4 CI has not emitted an observable WT_CLOSE_SESSION capsule for the writable diagnostic transport.close() path."
+    },
+    "evidence.baton.core.terminal-wrap-default-reader": {
+      "evidence": "Same positive-path caveat as baton.core.compact-default-reader and baton.core.medium-padded-default-reader: GitHub runs 26796690452 and 26798507855 document the constructor and close-session diagnostics, while run 26860542607 passed Safari positive padded boundary coverage before these terminal baton rows were added."
+    },
+    "evidence.baton.core.short-padded-default-reader": {
+      "evidence": "Same positive-path caveat as baton.core.medium-padded-default-reader: GitHub run 26796690452 recorded optionsConstructor.ok=true, run 26798507855 showed server.closeSessionReceived stayed 0 after diagnostics, and run 26830637957 passed Safari core E2E before the existing medium-padded scenario was added."
+    },
+    "expect.safari-server-open-bidi": {
+      "expect": {
+        "server": {
+          "streamTestFinReceived": null,
+          "streamTestFinReceivedMin": 0
+        }
+      }
+    },
+    "expect.safari-browser-close": {
+      "expect": {
+        "server": {
+          "closeSessionReceivedMin": null,
+          "closeSessionReceivedError42Min": null
+        }
+      }
+    }
+  },
+  "expected": [
+    {
+      "scenario": "baton.core.padded-byob",
+      "status": "skip",
+      "category": "browser-bug",
+      "browserVersion": "26.4",
+      "platform": "macOS",
+      "reason": "Safari 26.4 CI has failed the baton smoke on BYOB/default-padded incoming streams; keep this stricter scenario in the manifest but do not use it as Safari support evidence yet.",
+      "evidence": "GitHub runs 26793459264 and 26793617221 failed after ready while reading the first incoming stream; run 26794108055 failed after the first compact packet when localhost raced IPv4/IPv6. Compact default-reader smoke passed in run 26794207475."
+    },
+    {
+      "scenario": "datagrams.optional-unreliable",
+      "status": "pass",
+      "category": "browser-bug",
+      "browserVersion": "26.4",
+      "platform": "macOS",
+      "reason": "Safari 26.4 passed the optional-unreliable browser data path, including datagram delivery with requireUnreliable disabled, but did not emit an observable WT_CLOSE_SESSION capsule for the writable diagnostic transport.close() path and shows nondeterministic server visibility for the dedicated browser-close diagnostic in this scenario.",
+      "evidence": "GitHub WebTransportBrowser run 26829426456, Safari job 79106144176, failed only on server.closeSessionReceived >= 1 for datagrams.optional-unreliable after Safari baton smoke completed with datagramsReceived=[252], datagramsSent=1, protocol='devious-baton-00', and optionsConstructor.ok=true. Run 26835807876, Safari job 79129244107, failed datagrams.optional-unreliable only because server.browserCloseReceived=false. Run 26836501212, Safari job 79131700226, failed datagrams.optional-unreliable only because server.browserCloseReceived=true, so this field is treated as nondeterministic instead of a stable false assertion.",
+      "expect": {
+        "optionsConstructorOk": true,
+        "server": {
+          "closeSessionReceivedMin": 0,
+          "writableBadChunkCloseReceived": false,
+          "browserCloseReceived": null
+        }
+      }
+    },
+    {
+      "scenario": "handshake.reject_bad_certificate_hash",
+      "status": "pass",
+      "category": "browser-behavior",
+      "browserVersion": "26.4",
+      "platform": "macOS",
+      "reason": "Safari 26.4 can reject a WebTransport endpoint with a wrong serverCertificateHashes value before pico_baton sends any response packet. The negative certificate-hash claim remains valid because no WebTransport CONNECT is accepted.",
+      "evidence": "GitHub WebTransportBrowser run 26849816465, Safari job 79178839032, failed only because handshake.reject_bad_certificate_hash observed server.packetsSent=0 while connectAccepted=0 and the browser rejected the WebTransport attempt.",
+      "expect": {
+        "server": {
+          "packetsSentMin": null
+        }
+      }
+    },
+    {
+      "scenario": "datagrams.server-empty",
+      "status": "skip",
+      "category": "browser-bug",
+      "browserVersion": "26.4",
+      "platform": "macOS",
+      "reason": "Safari stable acknowledges an HTTP Datagram containing only the Quarter Stream ID, but does not expose the resulting zero-length WebTransport datagram to the JavaScript readable stream.",
+      "evidence": "GitHub WebTransportBrowser run 26842019982, Safari job 79151393623, timed out in datagrams.server-empty with datagramLengths=[] after pico_baton logged `datagram, length: 1: 00`."
+    },
+    {
+      "scenario": "datagrams.server-repeat-large",
+      "status": "skip",
+      "category": "browser-bug",
+      "browserVersion": "26.4",
+      "platform": "macOS",
+      "reason": "Safari 26.4 CI delivered only a partial repeated 1200-byte server datagram sequence before reporting a network error, so this lane does not claim large repeated server datagram delivery.",
+      "evidence": "GitHub WebTransportBrowser run 26863007007, Safari job 79220574211, failed datagrams.server-repeat-large after receiving four 1200-byte datagrams with datagramReceiveMin=16, then reported NetworkError. Chrome and Edge passed the same repeated-datagram batch in that run."
+    },
+    {
+      "scenario": "datagrams.client-repeat-large",
+      "status": "skip",
+      "category": "browser-bug",
+      "browserVersion": "26.4",
+      "platform": "macOS",
+      "reason": "Safari 26.4 CI wrote and delivered only part of the repeated 1200-byte browser-to-server datagram sequence before reporting a network error, so this lane does not claim large repeated client datagram delivery.",
+      "evidence": "GitHub WebTransportBrowser run 26863452355, Safari job 79221931481, failed datagrams.client-repeat-large after datagramsSent=10, server.sizedDatagramsReceived=10, server.datagramBytesReceived=12000, and NetworkError with datagramSendCount=16."
+    },
+    {
+      "scenario": "datagrams.client-repeat-one",
+      "status": "skip",
+      "category": "browser-bug",
+      "browserVersion": "26.4",
+      "platform": "macOS",
+      "reason": "Safari 26.4 CI wrote and delivered only part of the repeated one-byte browser-to-server datagram sequence before the stream closed, so this lane does not claim repeated small client datagram delivery.",
+      "evidence": "GitHub WebTransportBrowser run 26863744613, Safari job 79222810665, failed datagrams.client-repeat-one after datagramsSent=9, server.sizedDatagramsReceived=9, server.datagramBytesReceived=9, then TypeError: stream is closing or closed with datagramSendCount=16."
+    },
+    {
+      "scenario": "datagrams.client-empty",
+      "status": "pass",
+      "category": "browser-bug",
+      "browserVersion": "26.4",
+      "platform": "macOS",
+      "reason": "Safari 26.4 completes the browser-side zero-length datagram write scenario, but pico_baton does not receive an observable empty WebTransport datagram on the server side.",
+      "evidence": "GitHub WebTransportBrowser run 26842843051, Safari job 79154369173, reached datagrams.client-empty and failed only after earlier scenario assertions passed because server.emptyDatagramsReceived was 0.",
+      "expect": {
+        "server": {
+          "emptyDatagramsReceivedMin": null
+        }
+      }
+    },
+    {
+      "scenario": "baton.core.compact-default-reader",
+      "status": "pass",
+      "category": "browser-bug",
+      "browserVersion": "26.4",
+      "platform": "macOS",
+      "reason": "Safari stable throws NotSupportedError when allowPooling is true and serverCertificateHashes is non-empty, matching the W3C WebTransport constructor requirement, but Safari 26.4 CI did not emit an observable WT_CLOSE_SESSION capsule for the writable diagnostic transport.close() path.",
+      "evidence": "GitHub run 26796690452 on Safari 26.4 macOS recorded optionsConstructor.ok=true with detail 'NotSupportedError: The operation is not supported.' for baton.core.compact-default-reader. GitHub run 26798507855 passed Safari baton smoke but failed core E2E because server.closeSessionReceived stayed 0 for baton.core.compact-default-reader after diagnostics.",
+      "expect": {
+        "optionsConstructorOk": true,
+        "server": {
+          "closeSessionReceivedMin": 0,
+          "writableBadChunkCloseReceived": false
+        }
+      }
+    },
+    {
+      "scenario": "baton.core.terminal-wrap-default-reader",
+      "status": "pass",
+      "category": "browser-bug",
+      "browserVersion": "26.4",
+      "platform": "macOS",
+      "expect": {
+        "optionsConstructorOk": true,
+        "server": {
+          "closeSessionReceivedMin": 0,
+          "writableBadChunkCloseReceived": false
+        }
+      },
+      "reasonRef": "reason.baton.core.terminal-wrap-default-reader",
+      "evidenceRef": "evidence.baton.core.terminal-wrap-default-reader"
+    },
+    {
+      "scenario": "baton.core.terminal-immediate-default-reader",
+      "status": "pass",
+      "category": "browser-bug",
+      "browserVersion": "26.4",
+      "platform": "macOS",
+      "expect": {
+        "optionsConstructorOk": true,
+        "server": {
+          "closeSessionReceivedMin": 0,
+          "writableBadChunkCloseReceived": false
+        }
+      },
+      "reasonRef": "reason.baton.core.terminal-wrap-default-reader",
+      "evidenceRef": "evidence.baton.core.terminal-wrap-default-reader"
+    },
+    {
+      "scenario": "baton.core.short-padded-default-reader",
+      "status": "pass",
+      "category": "browser-bug",
+      "browserVersion": "26.4",
+      "platform": "macOS",
+      "expect": {
+        "optionsConstructorOk": true,
+        "server": {
+          "closeSessionReceivedMin": 0,
+          "writableBadChunkCloseReceived": false
+        }
+      },
+      "reasonRef": "reason.baton.core.terminal-wrap-default-reader",
+      "evidenceRef": "evidence.baton.core.short-padded-default-reader"
+    },
+    {
+      "scenario": "baton.core.varint-boundary-padded-default-reader",
+      "status": "pass",
+      "category": "browser-bug",
+      "browserVersion": "26.4",
+      "platform": "macOS",
+      "expect": {
+        "optionsConstructorOk": true,
+        "server": {
+          "closeSessionReceivedMin": 0,
+          "writableBadChunkCloseReceived": false
+        }
+      },
+      "reasonRef": "reason.baton.core.terminal-wrap-default-reader",
+      "evidenceRef": "evidence.baton.core.short-padded-default-reader"
+    },
+    {
+      "scenario": "baton.core.medium-padded-default-reader",
+      "status": "pass",
+      "category": "browser-bug",
+      "browserVersion": "26.4",
+      "platform": "macOS",
+      "evidence": "Same positive-path caveat as baton.core.compact-default-reader: GitHub run 26796690452 recorded optionsConstructor.ok=true and run 26798507855 showed server.closeSessionReceived stayed 0 after diagnostics. Run 26830637957 passed Safari core E2E before this medium-padded scenario was added.",
+      "expect": {
+        "optionsConstructorOk": true,
+        "server": {
+          "closeSessionReceivedMin": 0,
+          "writableBadChunkCloseReceived": false
+        }
+      },
+      "reasonRef": "reason.baton.core.terminal-wrap-default-reader"
+    },
+    {
+      "scenario": "baton.core.two-lane-compact-default-reader",
+      "status": "pass",
+      "category": "browser-bug",
+      "browserVersion": "26.4",
+      "platform": "macOS",
+      "reason": "Safari stable throws NotSupportedError for allowPooling with serverCertificateHashes, matching the W3C constructor requirement, and Safari 26.4 CI has not emitted an observable WT_CLOSE_SESSION capsule for the writable diagnostic transport.close() path. Safari 26.4 completed the two-lane server exchange in both observed C201 runs, but its browser-visible terminal-zero send event cardinality alternated between one and two, so this lane does not claim strict terminal-zero event cardinality for two concurrent compact baton lanes.",
+      "evidence": "Same positive-path caveat as baton.core.compact-default-reader: GitHub run 26796690452 recorded optionsConstructor.ok=true and run 26798507855 showed server.closeSessionReceived stayed 0 after diagnostics. Run 26908158085, Safari job 79378650076, failed baton.core.two-lane-compact-default-reader only because the browser result sent=[252,252,254,254,0] instead of [252,252,254,254,0,0], while the server trace proved All ZERO baton on two streams. Run 26909910667, Safari job 79384831781, produced sent=[252,252,254,254,0,0] and again proved both server zero batons.",
+      "expect": {
+        "optionsConstructorOk": true,
+        "sent": null,
+        "sentVariants": [
+          [
+            252,
+            252,
+            254,
+            254,
+            0
+          ],
+          [
+            252,
+            252,
+            254,
+            254,
+            0,
+            0
+          ]
+        ],
+        "server": {
+          "closeSessionReceivedMin": 0,
+          "writableBadChunkCloseReceived": false
+        }
+      }
+    },
+    {
+      "scenario": "datagrams.server-lossy-one",
+      "status": "pass",
+      "category": "browser-bug",
+      "browserVersion": "26.4",
+      "platform": "macOS",
+      "reason": "Safari 26.4 CI delivered the loss-tolerant 64-attempt server datagram row but reported the client stream sent-baton values as [252,0,254]. Keep this lossy row active while not claiming strict browser-visible sent-baton ordering for Safari on the lossy datagram path.",
+      "evidence": "GitHub WebTransportBrowser run 26924878809, Safari job 79432797585, failed datagrams.server-lossy-one only because the sent array was [252,0,254] instead of [252,254,0]. The same result proved connectAccepted=1, a server-observed baton datagram, All ZERO baton on stream 1, and a server WT_CLOSE_SESSION.",
+      "expect": {
+        "sent": null,
+        "sentVariants": [
+          [
+            252,
+            254,
+            0
+          ],
+          [
+            252,
+            0,
+            254
+          ]
+        ],
+        "sequenceOrderMatters": false
+      }
+    },
+    {
+      "scenario": "datagrams.server-burst-one",
+      "status": "pass",
+      "category": "browser-bug",
+      "browserVersion": "26.4",
+      "platform": "macOS",
+      "reason": "Safari 26.4 CI delivered the loss-tolerant 1000-attempt server datagram burst row but reported the client stream sent-baton values as [252,0,254] in one run and [252,0] in later runs. Keep this stress row active while not claiming strict sent-baton ordering or complete browser-visible terminal baton delivery for Safari on the lossy burst path.",
+      "evidence": "GitHub WebTransportBrowser run 26904158856, Safari job 79364305456, failed datagrams.server-burst-one only because the sent array was [252,0,254] instead of [252,254,0]. Run 26912514984, Safari job 79393979295, later delivered the same loss-tolerant row with sent=[252,0]. Run 26927483341, Safari job 79440304638, delivered the row with received=[251,253,255], sent=[252,0], datagram lengths observed, and failed only because the inherited eventsInclude still required sent 254. The scenario already carries datagram-loss-tolerated and datagram-ordering-not-assumed coverage.",
+      "expect": {
+        "sent": null,
+        "sentVariants": [
+          [
+            252,
+            254,
+            0
+          ],
+          [
+            252,
+            0
+          ]
+        ],
+        "eventsInclude": [
+          "ready",
+          "received 251 on remote-uni",
+          "datagram sent",
+          "sent 252",
+          "datagram length 1",
+          "received 253 on local-bidi",
+          "received 255 on remote-bidi",
+          "sent 0",
+          "closed"
+        ],
+        "sequenceOrderMatters": false
+      }
+    },
+    {
+      "scenario": "baton.core.four-lane-compact-default-reader",
+      "status": "skip",
+      "category": "browser-bug",
+      "browserVersion": "26.4",
+      "platform": "macOS",
+      "reason": "Safari 26.4 CI passes the compact one-lane and two-lane browser data paths, but timed out on the stricter four-lane compact scenario before delivering all four concurrent lanes. Keep the scenario active for browsers that pass it, but do not claim four-lane Safari stable conformance yet.",
+      "evidence": "GitHub WebTransportBrowser run 26847131054, Safari job 79169550184, timed out after 30000 ms on baton.core.four-lane-compact-default-reader with URL https://127.0.0.1:4433/baton?version=0&baton=251&count=4&padding=0. The server trace showed partial multi-lane progress, including All ZERO baton on streams 1 and 5, but the page did not finish all four lanes before timeout. Chrome job 79169550213 and Edge job 79169550278 passed the same four-lane scenario in that run."
+    },
+    {
+      "scenario": "baton.stream.sixteen-lane-compact-default-reader",
+      "status": "skip",
+      "category": "browser-bug",
+      "browserVersion": "26.4",
+      "platform": "macOS",
+      "reason": "Safari 26.4 CI passes compact one-lane and two-lane browser data paths, but the stricter four-lane compact scenario timed out before delivering all lanes. The sixteen-lane row is present for browsers that pass it, but Safari stable does not claim this higher-concurrency stream behavior yet.",
+      "evidence": "GitHub WebTransportBrowser run 26847131054, Safari job 79169550184, timed out after 30000 ms on baton.core.four-lane-compact-default-reader with partial multi-lane server progress. The sixteen-lane row exercises the same concurrent server-opened and browser-opened stream behavior at a higher count."
+    },
+    {
+      "scenario": "streams.server-open-bidi-zero",
+      "status": "pass",
+      "category": "browser-bug",
+      "browserVersion": "26.4",
+      "platform": "macOS",
+      "reason": "Safari 26.4 CI completed the browser-visible server-opened zero-byte bidirectional stream row, but the server did not observe the browser reply FIN in this run. Keep the row active while not claiming the server-observable reply-FIN counter for Safari stable.",
+      "evidence": "GitHub WebTransportBrowser run 26911316618, Safari job 79389755583, failed streams.server-open-bidi-zero only because server.streamTestFinReceived was 0 instead of 1. Earlier checks in the same row had already passed, and the manifest still preserves server.streamTestFinSent=1 for the server-opened FIN.",
+      "expectRef": "expect.safari-server-open-bidi"
+    },
+    {
+      "scenario": "streams.endpoint-server-open-bidi-zero",
+      "status": "pass",
+      "category": "browser-bug",
+      "browserVersion": "26.4",
+      "platform": "macOS",
+      "reason": "Safari 26.4 CI completed the browser-visible server-opened zero-byte bidirectional stream row, but the server did not observe the browser reply FIN in the equivalent C201 path. Keep the dedicated endpoint active while not claiming the server-observable reply-FIN counter for Safari stable.",
+      "evidence": "Same data path as streams.server-open-bidi-zero: WebTransportBrowser run 26911316618, Safari job 79389755583, failed only because server.streamTestFinReceived was 0 instead of 1, and run 26913123737 passed that expected-result classification.",
+      "expectRef": "expect.safari-server-open-bidi"
+    },
+    {
+      "scenario": "close.browser-close",
+      "status": "pass",
+      "category": "browser-bug",
+      "browserVersion": "26.4",
+      "platform": "macOS",
+      "reason": "Safari 26.4 CI completed the browser-originated close row but did not expose the browser close capsule to pico_baton's server summary. Keep the browser close API path active while not claiming server-observable close-capsule counters for Safari stable on this short-reason lane.",
+      "evidence": "GitHub WebTransportBrowser run 26964460277, Safari job 79563268513, passed Safari baton smoke, Chrome, Edge, Firefox, and WPT, then reached close.browser-close and failed only because server.closeSessionReceived was 0 instead of >= 1. The equivalent long-reason close row already records the same Safari server-observable close-capsule gap.",
+      "expectRef": "expect.safari-browser-close"
+    },
+    {
+      "scenario": "close.browser-close-long-reason",
+      "status": "pass",
+      "category": "browser-bug",
+      "browserVersion": "26.4",
+      "platform": "macOS",
+      "reason": "Safari 26.4 CI completed the browser-originated maximum-length close reason row but did not expose the browser close capsule to pico_baton's server summary. Keep the browser close API path active while not claiming server-observable close-capsule counters for Safari stable on this long-reason lane.",
+      "evidence": "GitHub WebTransportBrowser run 26925275375, Safari job 79433957451, passed Safari baton smoke and reached close.browser-close-long-reason after Chrome, Edge, Firefox, and WPT had passed. The row failed only because server.closeSessionReceived was 0 instead of >= 1; the stricter short close.browser-close row passed earlier in the same Safari run.",
+      "expectRef": "expect.safari-browser-close"
+    },
+    {
+      "scenario": "drain.server-drain",
+      "status": "pass",
+      "category": "browser-bug",
+      "browserVersion": "26.4",
+      "platform": "macOS",
+      "reason": "Safari 26.4 CI completed the server drain path but did not expose the browser close capsule that the page sends after observing the drain signal. Keep the drain row active while not claiming server-observable browser close-capsule counters for Safari stable on this drain-complete lane.",
+      "evidence": "GitHub WebTransportBrowser run 26925814953, Safari job 79435567957, passed Chrome, Edge, Firefox, WPT, and Safari baton smoke, then reached drain.server-drain and failed only because server.closeSessionReceived was 0 instead of >= 1. The row still preserves connect, origin, lifecycle trigger, and WT_DRAIN_SESSION server assertions.",
+      "expect": {
+        "server": {
+          "closeSessionReceivedMin": null
+        }
+      }
+    }
+  ]
+}

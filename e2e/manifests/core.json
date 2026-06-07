@@ -1,0 +1,3562 @@
+{
+  "suite": "core",
+  "description": "Portable WebTransport browser E2E scenarios backed by pico_baton.",
+  "templates": {
+    "negative-handshake": {
+      "runner": "browser-baton",
+      "protocol": "devious-baton-00",
+      "requireDatagram": true,
+      "useByob": false,
+      "timeoutMs": 30000,
+      "expect": {
+        "ok": false,
+        "requireDatagram": true,
+        "constructorRequireUnreliable": true,
+        "useByob": false,
+        "protocol": "",
+        "readyMs": 0,
+        "closedMs": 0,
+        "received": [],
+        "sent": [],
+        "datagramsReceived": [],
+        "datagramsSent": 0,
+        "eventsInclude": [
+          "connecting"
+        ],
+        "eventsExclude": [
+          "ready",
+          "closed",
+          "datagram sent"
+        ],
+        "errorIncludes": "WebTransportError",
+        "server": {
+          "connectAccepted": 0,
+          "optionalProtocolAccepted": 0,
+          "packetsReceivedMin": 1,
+          "packetsSentMin": 1
+        }
+      }
+    },
+    "positive-baton-diagnostic": {
+      "runner": "browser-baton",
+      "protocol": "devious-baton-00",
+      "timeoutMs": 30000,
+      "expect": {
+        "ok": true,
+        "protocol": "devious-baton-00",
+        "datagramsSent": 1,
+        "datagramWritableOk": true,
+        "streamWritableOk": true,
+        "postCloseOk": true,
+        "postCloseTestsInclude": [
+          "create-bidirectional-stream",
+          "create-unidirectional-stream"
+        ],
+        "closeSessionOk": true,
+        "closeSessionTestsInclude": [
+          "ready",
+          "close-called",
+          "closed-resolved"
+        ],
+        "protocolConstructorOk": true,
+        "protocolConstructorTestsInclude": [
+          "valid-protocol",
+          "duplicate-protocol",
+          "empty-protocol",
+          "long-protocol",
+          "non-isomorphic-protocol"
+        ],
+        "urlConstructorOk": true,
+        "urlConstructorTestsInclude": [
+          "http-url",
+          "url-fragment",
+          "malformed-url"
+        ],
+        "sessionDiagnosticsOk": true,
+        "sessionDiagnosticsTestsInclude": [
+          "ready-promise",
+          "closed-promise",
+          "protocol-property",
+          "incoming-bidirectional-readable",
+          "incoming-unidirectional-readable",
+          "create-bidirectional-stream-function",
+          "create-unidirectional-stream-function",
+          "datagrams-object",
+          "datagrams-readable",
+          "datagrams-writable-or-createWritable",
+          "reliability-optional",
+          "congestionControl-optional",
+          "supportsReliableOnly-optional",
+          "responseHeaders-optional",
+          "draining-optional",
+          "getStats-optional"
+        ],
+        "optionsConstructorTestsInclude": [
+          "allow-pooling-with-certificate-hash"
+        ],
+        "url": "{wtUrl}",
+        "server": {
+          "connectAcceptedMin": 1,
+          "optionalProtocolAccepted": 0,
+          "originMissing": 0,
+          "originRejected": 0,
+          "packetsReceivedMin": 1,
+          "packetsSentMin": 1,
+          "batonDatagramsReceivedMin": 1,
+          "closeSessionReceivedMin": 1,
+          "writableBadChunkCloseReceived": true,
+          "browserCloseReceived": true
+        }
+      }
+    },
+    "positive-baton-stream": {
+      "runner": "browser-baton",
+      "protocol": "devious-baton-00",
+      "requireDatagram": true,
+      "useByob": false,
+      "expect": {
+        "ok": true,
+        "protocol": "devious-baton-00",
+        "requireDatagram": true,
+        "constructorRequireUnreliable": true,
+        "useByob": false,
+        "datagramsSent": 1,
+        "eventsInclude": [
+          "ready",
+          "received 251 on remote-uni",
+          "datagram sent",
+          "sent 252",
+          "datagram 252",
+          "received 253 on local-bidi",
+          "sent 254",
+          "received 255 on remote-bidi",
+          "sent 0",
+          "closed"
+        ],
+        "sessionDiagnosticsOk": true,
+        "sessionDiagnosticsTestsInclude": [
+          "ready-promise",
+          "closed-promise",
+          "protocol-property",
+          "incoming-bidirectional-readable",
+          "incoming-unidirectional-readable",
+          "create-bidirectional-stream-function",
+          "create-unidirectional-stream-function",
+          "datagrams-object",
+          "datagrams-readable",
+          "datagrams-writable-or-createWritable"
+        ],
+        "postCloseOk": true,
+        "postCloseTestsInclude": [
+          "create-bidirectional-stream",
+          "create-unidirectional-stream"
+        ],
+        "url": "{wtUrl}",
+        "server": {
+          "connectAcceptedMin": 1,
+          "optionalProtocolAccepted": 0,
+          "originMissing": 0,
+          "originRejected": 0,
+          "packetsReceivedMin": 1,
+          "packetsSentMin": 1,
+          "batonDatagramsReceivedMin": 1
+        }
+      }
+    },
+    "datagram-server": {
+      "runner": "browser-baton",
+      "protocol": "devious-baton-00",
+      "requireDatagram": true,
+      "useByob": false,
+      "timeoutMs": 30000,
+      "expect": {
+        "ok": true,
+        "protocol": "devious-baton-00",
+        "requireDatagram": true,
+        "constructorRequireUnreliable": true,
+        "useByob": false,
+        "received": [
+          251,
+          253,
+          255
+        ],
+        "sent": [
+          252,
+          254,
+          0
+        ],
+        "datagramsReceived": [],
+        "datagramsSent": 1,
+        "url": "{wtUrl}",
+        "server": {
+          "connectAcceptedMin": 1,
+          "optionalProtocolAccepted": 0,
+          "originMissing": 0,
+          "originRejected": 0,
+          "packetsReceivedMin": 1,
+          "packetsSentMin": 1,
+          "batonDatagramsReceivedMin": 1,
+          "zeroBatonReceivedMin": 1
+        }
+      }
+    },
+    "datagram-client": {
+      "runner": "browser-baton",
+      "protocol": "devious-baton-00",
+      "requireDatagram": true,
+      "useByob": false,
+      "timeoutMs": 30000,
+      "expect": {
+        "ok": true,
+        "protocol": "devious-baton-00",
+        "requireDatagram": true,
+        "constructorRequireUnreliable": true,
+        "useByob": false,
+        "received": [
+          251,
+          253,
+          255
+        ],
+        "sent": [
+          252,
+          254,
+          0
+        ],
+        "datagramsReceived": [
+          252
+        ],
+        "url": "{wtUrl}",
+        "server": {
+          "connectAcceptedMin": 1,
+          "optionalProtocolAccepted": 0,
+          "originMissing": 0,
+          "originRejected": 0,
+          "packetsReceivedMin": 1,
+          "packetsSentMin": 1,
+          "zeroBatonReceivedMin": 1
+        }
+      }
+    },
+    "stream-transfer": {
+      "runner": "browser-baton",
+      "protocol": "devious-baton-00",
+      "requireDatagram": false,
+      "useByob": false,
+      "streamCount": 1,
+      "expect": {
+        "ok": true,
+        "protocol": "devious-baton-00",
+        "requireDatagram": false,
+        "constructorRequireUnreliable": false,
+        "useByob": false,
+        "streamCount": 1,
+        "streamFinReceived": 1,
+        "url": "{wtUrl}",
+        "server": {
+          "connectAcceptedMin": 1,
+          "optionalProtocolAccepted": 0,
+          "originMissing": 0,
+          "originRejected": 0,
+          "packetsReceivedMin": 1,
+          "packetsSentMin": 1,
+          "streamTestFinSent": 1
+        }
+      }
+    },
+    "reset-stream": {
+      "runner": "browser-baton",
+      "protocol": "devious-baton-00",
+      "requireDatagram": false,
+      "useByob": false,
+      "streamCount": 1,
+      "timeoutMs": 30000,
+      "expect": {
+        "ok": true,
+        "protocol": "devious-baton-00",
+        "requireDatagram": false,
+        "constructorRequireUnreliable": false,
+        "useByob": false,
+        "streamCount": 1,
+        "streamFinSent": 0,
+        "streamFinReceived": 0,
+        "url": "{wtUrl}",
+        "server": {
+          "connectAcceptedMin": 1,
+          "optionalProtocolAccepted": 0,
+          "originMissing": 0,
+          "originRejected": 0,
+          "packetsReceivedMin": 1,
+          "packetsSentMin": 1
+        }
+      }
+    },
+    "close-session": {
+      "runner": "browser-baton",
+      "protocol": "devious-baton-00",
+      "requireDatagram": false,
+      "useByob": false,
+      "timeoutMs": 30000,
+      "expect": {
+        "ok": true,
+        "requireDatagram": false,
+        "constructorRequireUnreliable": false,
+        "useByob": false,
+        "url": "{wtUrl}",
+        "server": {
+          "connectAcceptedMin": 1,
+          "optionalProtocolAccepted": 0,
+          "originMissing": 0,
+          "originRejected": 0,
+          "packetsReceivedMin": 1,
+          "packetsSentMin": 1
+        }
+      }
+    },
+    "drain-session": {
+      "runner": "browser-baton",
+      "protocol": "devious-baton-00",
+      "requireDatagram": false,
+      "useByob": false,
+      "timeoutMs": 30000,
+      "expect": {
+        "ok": true,
+        "requireDatagram": false,
+        "constructorRequireUnreliable": false,
+        "useByob": false,
+        "url": "{wtUrl}",
+        "server": {
+          "connectAcceptedMin": 1,
+          "optionalProtocolAccepted": 0,
+          "originMissing": 0,
+          "originRejected": 0,
+          "packetsReceivedMin": 1,
+          "packetsSentMin": 1,
+          "lifecycleTriggerReceivedMin": 1,
+          "drainSessionSentMin": 1
+        }
+      }
+    },
+    "session-gone": {
+      "runner": "browser-baton",
+      "protocol": "devious-baton-00",
+      "useByob": false,
+      "timeoutMs": 30000,
+      "expect": {
+        "ok": true,
+        "protocol": "devious-baton-00",
+        "useByob": false,
+        "streamBytesSent": 1,
+        "url": "{wtUrl}",
+        "server": {
+          "connectAcceptedMin": 1,
+          "optionalProtocolAccepted": 0,
+          "originMissing": 0,
+          "originRejected": 0,
+          "packetsReceivedMin": 1,
+          "packetsSentMin": 1,
+          "lifecycleTriggerReceivedMin": 1,
+          "closeSessionSentMin": 1,
+          "closeSessionSentError42Min": 1
+        }
+      }
+    }
+  },
+  "scenarios": [
+    {
+      "id": "handshake.reject_404",
+      "title": "Unrouted WebTransport path rejects ready",
+      "template": "negative-handshake",
+      "wtUrl": "https://127.0.0.1:{port}/missing?version=0&baton=251&count=1&padding=0",
+      "coverage": [
+        "constructor",
+        "ready-rejects",
+        "routing-reject",
+        "server-no-connect-accept"
+      ],
+      "expect": {
+        "url": "{wtUrl}"
+      }
+    },
+    {
+      "id": "handshake.reject_400",
+      "title": "Explicit 400 WebTransport path rejects ready",
+      "template": "negative-handshake",
+      "wtUrl": "https://127.0.0.1:{port}/baton-reject-400?version=0&baton=251&count=1&padding=0",
+      "coverage": [
+        "constructor",
+        "ready-rejects",
+        "handshake-status-reject",
+        "handshake-status-400",
+        "server-no-connect-accept"
+      ],
+      "expect": {
+        "url": "{wtUrl}"
+      }
+    },
+    {
+      "id": "handshake.reject_403",
+      "title": "Explicit 403 WebTransport path rejects ready",
+      "template": "negative-handshake",
+      "wtUrl": "https://127.0.0.1:{port}/baton-reject-403?version=0&baton=251&count=1&padding=0",
+      "coverage": [
+        "constructor",
+        "ready-rejects",
+        "handshake-status-reject",
+        "handshake-status-403",
+        "server-no-connect-accept"
+      ],
+      "expect": {
+        "url": "{wtUrl}"
+      }
+    },
+    {
+      "id": "handshake.reject_429",
+      "title": "Explicit 429 WebTransport path rejects ready",
+      "template": "negative-handshake",
+      "wtUrl": "https://127.0.0.1:{port}/baton-reject-429?version=0&baton=251&count=1&padding=0",
+      "coverage": [
+        "constructor",
+        "ready-rejects",
+        "handshake-status-reject",
+        "handshake-status-429",
+        "server-no-connect-accept"
+      ],
+      "expect": {
+        "url": "{wtUrl}"
+      }
+    },
+    {
+      "id": "handshake.reject_500",
+      "title": "Explicit 500 WebTransport path rejects ready",
+      "template": "negative-handshake",
+      "wtUrl": "https://127.0.0.1:{port}/baton-reject-500?version=0&baton=251&count=1&padding=0",
+      "coverage": [
+        "constructor",
+        "ready-rejects",
+        "handshake-status-reject",
+        "handshake-status-500",
+        "server-no-connect-accept"
+      ],
+      "expect": {
+        "url": "{wtUrl}"
+      }
+    },
+    {
+      "id": "handshake.reject_unsupported_protocol",
+      "title": "Unsupported WT-Available-Protocols value rejects ready",
+      "runner": "browser-baton",
+      "wtUrl": "https://127.0.0.1:{port}/baton?version=0&baton=251&count=1&padding=0",
+      "protocol": "unsupported-baton-00",
+      "requireDatagram": true,
+      "useByob": false,
+      "timeoutMs": 30000,
+      "coverage": [
+        "constructor",
+        "ready-rejects",
+        "WT-Available-Protocols",
+        "WT-Protocol-required",
+        "server-no-connect-accept"
+      ],
+      "expect": {
+        "ok": false,
+        "url": "https://127.0.0.1:{port}/baton?version=0&baton=251&count=1&padding=0",
+        "requireDatagram": true,
+        "constructorRequireUnreliable": true,
+        "useByob": false,
+        "protocol": "",
+        "readyMs": 0,
+        "closedMs": 0,
+        "received": [],
+        "sent": [],
+        "datagramsReceived": [],
+        "datagramsSent": 0,
+        "eventsInclude": [
+          "connecting"
+        ],
+        "eventsExclude": [
+          "ready",
+          "closed",
+          "datagram sent"
+        ],
+        "errorIncludes": "WebTransportError",
+        "server": {
+          "connectAccepted": 0,
+          "optionalProtocolAccepted": 0
+        }
+      }
+    },
+    {
+      "id": "origin.deny",
+      "title": "Denied WebTransport Origin rejects ready",
+      "template": "negative-handshake",
+      "wtUrl": "https://127.0.0.1:{port}/baton-origin-deny?version=0&baton=251&count=1&padding=0",
+      "coverage": [
+        "constructor",
+        "ready-rejects",
+        "Origin-header",
+        "origin-policy-deny",
+        "server-no-connect-accept"
+      ],
+      "expect": {
+        "url": "{wtUrl}",
+        "server": {
+          "originMissing": 0,
+          "originRejectedMin": 1
+        }
+      }
+    },
+    {
+      "id": "handshake.reject_bad_certificate_hash",
+      "title": "Wrong serverCertificateHashes value rejects ready",
+      "template": "negative-handshake",
+      "wtUrl": "https://127.0.0.1:{port}/baton?version=0&baton=251&count=1&padding=0",
+      "coverage": [
+        "constructor",
+        "ready-rejects",
+        "serverCertificateHashes",
+        "certificate-hash-reject",
+        "server-no-connect-accept"
+      ],
+      "certificateHashMode": "wrong",
+      "expect": {
+        "url": "{wtUrl}"
+      }
+    },
+    {
+      "id": "handshake.reject_unsupported_certificate_hash_algorithm",
+      "title": "Unsupported serverCertificateHashes algorithm does not establish",
+      "runner": "browser-baton",
+      "wtUrl": "https://127.0.0.1:{port}/baton?version=0&baton=251&count=1&padding=0",
+      "protocol": "devious-baton-00",
+      "requireDatagram": true,
+      "useByob": false,
+      "timeoutMs": 30000,
+      "certificateHashAlgorithm": "sha-512",
+      "coverage": [
+        "constructor",
+        "serverCertificateHashes",
+        "certificate-hash-algorithm-reject",
+        "server-no-connect-accept"
+      ],
+      "expect": {
+        "ok": false,
+        "url": "https://127.0.0.1:{port}/baton?version=0&baton=251&count=1&padding=0",
+        "requireDatagram": true,
+        "constructorRequireUnreliable": true,
+        "useByob": false,
+        "protocol": "",
+        "readyMs": 0,
+        "closedMs": 0,
+        "received": [],
+        "sent": [],
+        "datagramsReceived": [],
+        "datagramsSent": 0,
+        "eventsExclude": [
+          "ready",
+          "closed",
+          "datagram sent"
+        ],
+        "server": {
+          "connectAccepted": 0,
+          "optionalProtocolAccepted": 0
+        }
+      }
+    },
+    {
+      "id": "handshake.reject_bad_baton_query",
+      "title": "Malformed baton endpoint parameters reject ready",
+      "template": "negative-handshake",
+      "wtUrl": "https://127.0.0.1:{port}/baton?version=1&baton=251&count=1&padding=0",
+      "coverage": [
+        "constructor",
+        "ready-rejects",
+        "endpoint-parameter-validation",
+        "server-no-connect-accept"
+      ],
+      "expect": {
+        "url": "{wtUrl}"
+      }
+    },
+    {
+      "id": "handshake.reject_bad_version_non_numeric",
+      "title": "Non-numeric baton endpoint version rejects ready",
+      "template": "negative-handshake",
+      "wtUrl": "https://127.0.0.1:{port}/baton?version=abc&baton=251&count=1&padding=0",
+      "coverage": [
+        "constructor",
+        "ready-rejects",
+        "endpoint-parameter-validation",
+        "version-parse",
+        "server-no-connect-accept"
+      ],
+      "expect": {
+        "url": "{wtUrl}"
+      }
+    },
+    {
+      "id": "handshake.reject_bad_baton_value",
+      "title": "Out-of-range baton endpoint value rejects ready",
+      "template": "negative-handshake",
+      "wtUrl": "https://127.0.0.1:{port}/baton?version=0&baton=256&count=1&padding=0",
+      "coverage": [
+        "constructor",
+        "ready-rejects",
+        "endpoint-parameter-validation",
+        "baton-byte-range",
+        "server-no-connect-accept"
+      ],
+      "expect": {
+        "url": "{wtUrl}"
+      }
+    },
+    {
+      "id": "handshake.reject_bad_baton_non_numeric",
+      "title": "Non-numeric baton endpoint value rejects ready",
+      "template": "negative-handshake",
+      "wtUrl": "https://127.0.0.1:{port}/baton?version=0&baton=abc&count=1&padding=0",
+      "coverage": [
+        "constructor",
+        "ready-rejects",
+        "endpoint-parameter-validation",
+        "baton-byte-parse",
+        "server-no-connect-accept"
+      ],
+      "expect": {
+        "url": "{wtUrl}"
+      }
+    },
+    {
+      "id": "handshake.reject_bad_count_zero",
+      "title": "Zero baton lane count rejects ready",
+      "template": "negative-handshake",
+      "wtUrl": "https://127.0.0.1:{port}/baton?version=0&baton=251&count=0&padding=0",
+      "coverage": [
+        "constructor",
+        "ready-rejects",
+        "endpoint-parameter-validation",
+        "lane-count-range",
+        "server-no-connect-accept"
+      ],
+      "expect": {
+        "url": "{wtUrl}"
+      }
+    },
+    {
+      "id": "handshake.reject_bad_count_non_numeric",
+      "title": "Non-numeric baton lane count rejects ready",
+      "template": "negative-handshake",
+      "wtUrl": "https://127.0.0.1:{port}/baton?version=0&baton=251&count=abc&padding=0",
+      "coverage": [
+        "constructor",
+        "ready-rejects",
+        "endpoint-parameter-validation",
+        "lane-count-parse",
+        "server-no-connect-accept"
+      ],
+      "expect": {
+        "url": "{wtUrl}"
+      }
+    },
+    {
+      "id": "handshake.reject_bad_count_excess",
+      "title": "Excessive baton lane count rejects ready",
+      "template": "negative-handshake",
+      "wtUrl": "https://127.0.0.1:{port}/baton?version=0&baton=251&count=257&padding=0",
+      "coverage": [
+        "constructor",
+        "ready-rejects",
+        "endpoint-parameter-validation",
+        "lane-count-range",
+        "server-no-connect-accept"
+      ],
+      "expect": {
+        "url": "{wtUrl}"
+      }
+    },
+    {
+      "id": "handshake.reject_bad_padding_non_numeric",
+      "title": "Non-numeric baton padding rejects ready",
+      "template": "negative-handshake",
+      "wtUrl": "https://127.0.0.1:{port}/baton?version=0&baton=251&count=1&padding=abc",
+      "coverage": [
+        "constructor",
+        "ready-rejects",
+        "endpoint-parameter-validation",
+        "padding-parse",
+        "server-no-connect-accept"
+      ],
+      "expect": {
+        "url": "{wtUrl}"
+      }
+    },
+    {
+      "id": "handshake.reject_bad_padding_excess",
+      "title": "Excessive baton padding rejects ready",
+      "template": "negative-handshake",
+      "wtUrl": "https://127.0.0.1:{port}/baton?version=0&baton=251&count=1&padding=16384",
+      "coverage": [
+        "constructor",
+        "ready-rejects",
+        "endpoint-parameter-validation",
+        "padding-range",
+        "server-no-connect-accept"
+      ],
+      "expect": {
+        "url": "{wtUrl}"
+      }
+    },
+    {
+      "id": "handshake.reject_bad_protocol_mode",
+      "title": "Unsupported baton protocol mode rejects ready",
+      "template": "negative-handshake",
+      "wtUrl": "https://127.0.0.1:{port}/baton?version=0&baton=251&count=1&padding=0&protocol=bad",
+      "coverage": [
+        "constructor",
+        "ready-rejects",
+        "endpoint-parameter-validation",
+        "protocol-mode-validation",
+        "server-no-connect-accept"
+      ],
+      "expect": {
+        "url": "{wtUrl}"
+      }
+    },
+    {
+      "id": "handshake.reject_bad_datagram_mode",
+      "title": "Unsupported baton datagram mode rejects ready",
+      "template": "negative-handshake",
+      "wtUrl": "https://127.0.0.1:{port}/baton?version=0&baton=251&count=1&padding=0&datagram=bad",
+      "coverage": [
+        "constructor",
+        "ready-rejects",
+        "endpoint-parameter-validation",
+        "datagram-mode-validation",
+        "server-no-connect-accept"
+      ],
+      "expect": {
+        "url": "{wtUrl}"
+      }
+    },
+    {
+      "id": "handshake.reject_bad_client_datagram_mode",
+      "title": "Unsupported baton client datagram mode rejects ready",
+      "template": "negative-handshake",
+      "wtUrl": "https://127.0.0.1:{port}/baton?version=0&baton=251&count=1&padding=0&client_datagram=bad",
+      "coverage": [
+        "constructor",
+        "ready-rejects",
+        "endpoint-parameter-validation",
+        "client-datagram-mode-validation",
+        "server-no-connect-accept"
+      ],
+      "expect": {
+        "url": "{wtUrl}"
+      }
+    },
+    {
+      "id": "datagrams.server-oversize-reject",
+      "title": "Oversized server WebTransport datagram request rejects ready",
+      "template": "negative-handshake",
+      "wtUrl": "https://127.0.0.1:{port}/baton?version=0&baton=251&count=1&padding=0&datagram_size=1537",
+      "coverage": [
+        "constructor",
+        "ready-rejects",
+        "endpoint-parameter-validation",
+        "datagram-oversize-reject",
+        "server-datagram-oversize-reject",
+        "server-no-connect-accept"
+      ],
+      "expect": {
+        "url": "{wtUrl}"
+      }
+    },
+    {
+      "id": "datagrams.client-oversize-reject",
+      "title": "Oversized client WebTransport datagram expectation rejects ready",
+      "template": "negative-handshake",
+      "wtUrl": "https://127.0.0.1:{port}/baton?version=0&baton=251&count=1&padding=0&client_datagram_size=1537",
+      "coverage": [
+        "constructor",
+        "ready-rejects",
+        "endpoint-parameter-validation",
+        "datagram-oversize-reject",
+        "client-datagram-oversize-reject",
+        "server-no-connect-accept"
+      ],
+      "expect": {
+        "url": "{wtUrl}"
+      }
+    },
+    {
+      "id": "datagrams.server-count-zero-reject",
+      "title": "Zero server WebTransport datagram count rejects ready",
+      "template": "negative-handshake",
+      "wtUrl": "https://127.0.0.1:{port}/baton?version=0&baton=251&count=1&padding=0&datagram_size=1&datagram_count=0",
+      "coverage": [
+        "constructor",
+        "ready-rejects",
+        "endpoint-parameter-validation",
+        "datagram-count-validation",
+        "datagram-count-zero-reject",
+        "server-no-connect-accept"
+      ],
+      "expect": {
+        "url": "{wtUrl}"
+      }
+    },
+    {
+      "id": "datagrams.server-count-excess-reject",
+      "title": "Excess server WebTransport datagram count rejects ready",
+      "template": "negative-handshake",
+      "wtUrl": "https://127.0.0.1:{port}/baton?version=0&baton=251&count=1&padding=0&datagram_size=1&datagram_count=1001",
+      "coverage": [
+        "constructor",
+        "ready-rejects",
+        "endpoint-parameter-validation",
+        "datagram-count-validation",
+        "datagram-count-excess-reject",
+        "server-no-connect-accept"
+      ],
+      "expect": {
+        "url": "{wtUrl}"
+      }
+    },
+    {
+      "id": "datagrams.server-count-without-size-reject",
+      "title": "Repeated server WebTransport datagram count without size rejects ready",
+      "template": "negative-handshake",
+      "wtUrl": "https://127.0.0.1:{port}/baton?version=0&baton=251&count=1&padding=0&datagram_count=16",
+      "coverage": [
+        "constructor",
+        "ready-rejects",
+        "endpoint-parameter-validation",
+        "datagram-count-validation",
+        "datagram-count-without-size-reject",
+        "server-no-connect-accept"
+      ],
+      "expect": {
+        "url": "{wtUrl}"
+      }
+    },
+    {
+      "id": "datagrams.server-count-non-numeric-reject",
+      "title": "Non-numeric server WebTransport datagram count rejects ready",
+      "template": "negative-handshake",
+      "wtUrl": "https://127.0.0.1:{port}/baton?version=0&baton=251&count=1&padding=0&datagram_size=1&datagram_count=abc",
+      "coverage": [
+        "constructor",
+        "ready-rejects",
+        "endpoint-parameter-validation",
+        "datagram-count-validation",
+        "datagram-count-parse-reject",
+        "server-no-connect-accept"
+      ],
+      "expect": {
+        "url": "{wtUrl}"
+      }
+    },
+    {
+      "id": "baton.core.padded-byob",
+      "title": "Baton stream/datagram/protocol exchange with default padding and BYOB readers",
+      "wtUrl": "https://127.0.0.1:{port}/baton?version=0&baton=251&count=1",
+      "requireDatagram": true,
+      "useByob": true,
+      "coverage": [
+        "constructor",
+        "URL-constructor",
+        "constructor-options-observed",
+        "allowPooling-serverCertificateHashes-observed",
+        "ready",
+        "closed",
+        "Origin-header",
+        "origin-policy-allow",
+        "WT-Protocol",
+        "session-diagnostics",
+        "BYOB-reader",
+        "default-padded-baton-packet",
+        "incoming-unidirectional-stream",
+        "incoming-bidirectional-stream",
+        "outgoing-unidirectional-stream",
+        "stream-bad-chunk",
+        "unidirectional-stream-bad-chunk",
+        "outgoing-bidirectional-stream",
+        "bidirectional-stream-bad-chunk",
+        "datagram-send",
+        "datagram-bad-chunk",
+        "datagram-receive",
+        "new-stream-after-close",
+        "browser-close",
+        "close-capsule"
+      ],
+      "expect": {
+        "requireDatagram": true,
+        "constructorRequireUnreliable": true,
+        "useByob": true,
+        "received": [
+          251,
+          253,
+          255
+        ],
+        "sent": [
+          252,
+          254,
+          0
+        ],
+        "datagramsReceived": [
+          252
+        ],
+        "eventsInclude": [
+          "ready",
+          "received 251 on remote-uni",
+          "datagram sent",
+          "sent 252",
+          "datagram 252",
+          "received 253 on local-bidi",
+          "sent 254",
+          "received 255 on remote-bidi",
+          "sent 0",
+          "closed"
+        ],
+        "datagramWritableTestsInclude": [
+          "string-chunk"
+        ],
+        "streamWritableTestsInclude": [
+          "unidirectional-string-chunk",
+          "bidirectional-string-chunk"
+        ],
+        "server": {
+          "zeroBatonReceivedMin": 1
+        }
+      },
+      "template": "positive-baton-diagnostic"
+    },
+    {
+      "id": "datagrams.optional-unreliable",
+      "title": "Datagrams work when requireUnreliable is disabled",
+      "wtUrl": "https://127.0.0.1:{port}/baton?version=0&baton=251&count=1&padding=0",
+      "requireDatagram": false,
+      "useByob": false,
+      "coverage": [
+        "constructor",
+        "requireUnreliable-optional",
+        "ready",
+        "closed",
+        "Origin-header",
+        "origin-policy-allow",
+        "WT-Protocol",
+        "session-diagnostics",
+        "incoming-unidirectional-stream",
+        "incoming-bidirectional-stream",
+        "outgoing-unidirectional-stream",
+        "outgoing-bidirectional-stream",
+        "datagram-send",
+        "datagram-receive",
+        "datagram-available-without-requireUnreliable",
+        "new-stream-after-close",
+        "browser-close",
+        "close-capsule"
+      ],
+      "expect": {
+        "requireDatagram": false,
+        "constructorRequireUnreliable": false,
+        "useByob": false,
+        "received": [
+          251,
+          253,
+          255
+        ],
+        "sent": [
+          252,
+          254,
+          0
+        ],
+        "datagramsReceived": [
+          252
+        ],
+        "eventsInclude": [
+          "ready",
+          "received 251 on remote-uni",
+          "datagram sent",
+          "sent 252",
+          "datagram 252",
+          "received 253 on local-bidi",
+          "sent 254",
+          "received 255 on remote-bidi",
+          "sent 0",
+          "closed"
+        ],
+        "datagramWritableTestsInclude": [
+          "string-chunk"
+        ],
+        "streamWritableTestsInclude": [
+          "unidirectional-string-chunk",
+          "bidirectional-string-chunk"
+        ],
+        "server": {
+          "zeroBatonReceivedMin": 1
+        }
+      },
+      "template": "positive-baton-diagnostic"
+    },
+    {
+      "id": "datagrams.server-empty",
+      "title": "Browser receives a zero-length server WebTransport datagram",
+      "wtUrl": "https://127.0.0.1:{port}/baton?version=0&baton=251&count=1&padding=0&datagram=empty",
+      "datagramReceiveMode": "empty",
+      "coverage": [
+        "constructor",
+        "ready",
+        "closed",
+        "Origin-header",
+        "origin-policy-allow",
+        "WT-Protocol",
+        "session-diagnostics",
+        "incoming-unidirectional-stream",
+        "incoming-bidirectional-stream",
+        "outgoing-unidirectional-stream",
+        "outgoing-bidirectional-stream",
+        "datagram-send",
+        "zero-length-datagram-receive",
+        "new-stream-after-close"
+      ],
+      "expect": {
+        "datagramReceiveMode": "empty",
+        "datagramLengths": [
+          0
+        ],
+        "eventsInclude": [
+          "ready",
+          "received 251 on remote-uni",
+          "datagram sent",
+          "sent 252",
+          "datagram length 0",
+          "received 253 on local-bidi",
+          "sent 254",
+          "received 255 on remote-bidi",
+          "sent 0",
+          "closed"
+        ],
+        "postCloseOk": true,
+        "postCloseTestsInclude": [
+          "create-bidirectional-stream",
+          "create-unidirectional-stream"
+        ],
+        "sessionDiagnosticsOk": true,
+        "sessionDiagnosticsTestsInclude": [
+          "ready-promise",
+          "closed-promise",
+          "protocol-property",
+          "incoming-bidirectional-readable",
+          "incoming-unidirectional-readable",
+          "create-bidirectional-stream-function",
+          "create-unidirectional-stream-function",
+          "datagrams-object",
+          "datagrams-readable",
+          "datagrams-writable-or-createWritable",
+          "reliability-optional",
+          "congestionControl-optional",
+          "supportsReliableOnly-optional",
+          "responseHeaders-optional",
+          "draining-optional",
+          "getStats-optional"
+        ]
+      },
+      "template": "datagram-server"
+    },
+    {
+      "id": "baton.core.compact-default-reader",
+      "title": "Baton stream/datagram/protocol exchange with compact packets",
+      "wtUrl": "https://127.0.0.1:{port}/baton?version=0&baton=251&count=1&padding=0",
+      "requireDatagram": true,
+      "useByob": false,
+      "coverage": [
+        "constructor",
+        "URL-constructor",
+        "constructor-options-observed",
+        "allowPooling-serverCertificateHashes-observed",
+        "ready",
+        "closed",
+        "Origin-header",
+        "origin-policy-allow",
+        "WT-Protocol",
+        "session-diagnostics",
+        "stats-optional-observed",
+        "reliability-optional-observed",
+        "congestionControl-optional-observed",
+        "supportsReliableOnly-optional-observed",
+        "responseHeaders-optional-observed",
+        "draining-optional-observed",
+        "sendOrder-options-observed",
+        "stream-echo-bidi",
+        "stream-echo-uni",
+        "stream-server-open-uni-count-1",
+        "stream-server-open-bidi-count-1",
+        "stream-fin-after-data",
+        "stream-readable-completion",
+        "stream-writer-ready",
+        "incoming-unidirectional-stream",
+        "incoming-bidirectional-stream",
+        "outgoing-unidirectional-stream",
+        "stream-bad-chunk",
+        "unidirectional-stream-bad-chunk",
+        "outgoing-bidirectional-stream",
+        "bidirectional-stream-bad-chunk",
+        "datagram-send",
+        "datagram-bad-chunk",
+        "datagram-receive",
+        "new-stream-after-close",
+        "datagram-write-after-close",
+        "datagram-drop-after-close",
+        "browser-close",
+        "close-capsule"
+      ],
+      "expect": {
+        "requireDatagram": true,
+        "constructorRequireUnreliable": true,
+        "useByob": false,
+        "received": [
+          251,
+          253,
+          255
+        ],
+        "sent": [
+          252,
+          254,
+          0
+        ],
+        "datagramsReceived": [
+          252
+        ],
+        "eventsInclude": [
+          "ready",
+          "received 251 on remote-uni",
+          "datagram sent",
+          "sent 252",
+          "datagram 252",
+          "received 253 on local-bidi",
+          "sent 254",
+          "received 255 on remote-bidi",
+          "sent 0",
+          "closed"
+        ],
+        "datagramWritableTestsInclude": [
+          "string-chunk",
+          "datagram-createWritable-sendOrder-optional"
+        ],
+        "streamWritableTestsInclude": [
+          "unidirectional-string-chunk",
+          "bidirectional-string-chunk",
+          "unidirectional-sendOrder-option",
+          "bidirectional-sendOrder-option"
+        ],
+        "postCloseDatagramOk": true,
+        "postCloseDatagramTestsInclude": [
+          "datagram-write-after-close"
+        ],
+        "server": {
+          "zeroBatonReceivedMin": 1
+        }
+      },
+      "template": "positive-baton-diagnostic"
+    },
+    {
+      "id": "baton.core.terminal-wrap-default-reader",
+      "title": "Baton stream exchange sends terminal zero after short wrap",
+      "wtUrl": "https://127.0.0.1:{port}/baton?version=0&baton=253&count=1&padding=0",
+      "requireDatagram": false,
+      "useByob": false,
+      "coverage": [
+        "constructor",
+        "URL-constructor",
+        "constructor-options-observed",
+        "allowPooling-serverCertificateHashes-observed",
+        "ready",
+        "closed",
+        "Origin-header",
+        "origin-policy-allow",
+        "WT-Protocol",
+        "session-diagnostics",
+        "default-reader",
+        "terminal-baton-wrap",
+        "terminal-zero-baton-send",
+        "no-server-datagram-required",
+        "incoming-unidirectional-stream",
+        "outgoing-bidirectional-stream",
+        "stream-bad-chunk",
+        "unidirectional-stream-bad-chunk",
+        "bidirectional-stream-bad-chunk",
+        "datagram-send",
+        "datagram-bad-chunk",
+        "new-stream-after-close",
+        "browser-close",
+        "close-capsule"
+      ],
+      "expect": {
+        "requireDatagram": false,
+        "constructorRequireUnreliable": false,
+        "useByob": false,
+        "received": [
+          253,
+          255
+        ],
+        "sent": [
+          254,
+          0
+        ],
+        "datagramsReceived": [],
+        "datagramLengths": [],
+        "eventsInclude": [
+          "ready",
+          "received 253 on remote-uni",
+          "datagram sent",
+          "sent 254",
+          "received 255 on local-bidi",
+          "sent 0",
+          "closed"
+        ],
+        "datagramWritableTestsInclude": [
+          "string-chunk"
+        ],
+        "streamWritableTestsInclude": [
+          "unidirectional-string-chunk",
+          "bidirectional-string-chunk"
+        ],
+        "server": {
+          "zeroBatonReceivedMin": 1
+        }
+      },
+      "template": "positive-baton-diagnostic"
+    },
+    {
+      "id": "baton.core.terminal-immediate-default-reader",
+      "title": "Baton stream exchange sends terminal zero immediately",
+      "wtUrl": "https://127.0.0.1:{port}/baton?version=0&baton=255&count=1&padding=0",
+      "requireDatagram": false,
+      "useByob": false,
+      "coverage": [
+        "constructor",
+        "URL-constructor",
+        "constructor-options-observed",
+        "allowPooling-serverCertificateHashes-observed",
+        "ready",
+        "closed",
+        "Origin-header",
+        "origin-policy-allow",
+        "WT-Protocol",
+        "session-diagnostics",
+        "default-reader",
+        "terminal-baton-immediate",
+        "terminal-zero-baton-send",
+        "no-server-datagram-required",
+        "incoming-unidirectional-stream",
+        "outgoing-bidirectional-stream",
+        "stream-bad-chunk",
+        "unidirectional-stream-bad-chunk",
+        "bidirectional-stream-bad-chunk",
+        "datagram-send",
+        "datagram-bad-chunk",
+        "new-stream-after-close",
+        "browser-close",
+        "close-capsule"
+      ],
+      "expect": {
+        "requireDatagram": false,
+        "constructorRequireUnreliable": false,
+        "useByob": false,
+        "received": [
+          255
+        ],
+        "sent": [
+          0
+        ],
+        "datagramsReceived": [],
+        "datagramLengths": [],
+        "eventsInclude": [
+          "ready",
+          "received 255 on remote-uni",
+          "datagram sent",
+          "sent 0",
+          "closed"
+        ],
+        "datagramWritableTestsInclude": [
+          "string-chunk"
+        ],
+        "streamWritableTestsInclude": [
+          "unidirectional-string-chunk",
+          "bidirectional-string-chunk"
+        ],
+        "server": {
+          "zeroBatonReceivedMin": 1
+        }
+      },
+      "template": "positive-baton-diagnostic"
+    },
+    {
+      "id": "datagrams.client-empty",
+      "title": "Server receives a zero-length browser WebTransport datagram",
+      "wtUrl": "https://127.0.0.1:{port}/baton?version=0&baton=251&count=1&padding=0&client_datagram=empty",
+      "datagramSendMode": "empty",
+      "coverage": [
+        "constructor",
+        "ready",
+        "closed",
+        "Origin-header",
+        "origin-policy-allow",
+        "WT-Protocol",
+        "session-diagnostics",
+        "incoming-unidirectional-stream",
+        "incoming-bidirectional-stream",
+        "outgoing-unidirectional-stream",
+        "outgoing-bidirectional-stream",
+        "zero-length-datagram-send",
+        "datagram-receive",
+        "server-empty-datagram-trace",
+        "new-stream-after-close"
+      ],
+      "expect": {
+        "datagramSendMode": "empty",
+        "datagramsSent": 1,
+        "eventsInclude": [
+          "ready",
+          "received 251 on remote-uni",
+          "datagram sent length 0",
+          "sent 252",
+          "datagram 252",
+          "received 253 on local-bidi",
+          "sent 254",
+          "received 255 on remote-bidi",
+          "sent 0",
+          "closed"
+        ],
+        "postCloseOk": true,
+        "postCloseTestsInclude": [
+          "create-bidirectional-stream",
+          "create-unidirectional-stream"
+        ],
+        "sessionDiagnosticsOk": true,
+        "sessionDiagnosticsTestsInclude": [
+          "ready-promise",
+          "closed-promise",
+          "protocol-property",
+          "incoming-bidirectional-readable",
+          "incoming-unidirectional-readable",
+          "create-bidirectional-stream-function",
+          "create-unidirectional-stream-function",
+          "datagrams-object",
+          "datagrams-readable",
+          "datagrams-writable-or-createWritable",
+          "reliability-optional",
+          "congestionControl-optional",
+          "supportsReliableOnly-optional",
+          "responseHeaders-optional",
+          "draining-optional",
+          "getStats-optional"
+        ],
+        "server": {
+          "emptyDatagramsReceivedMin": 1
+        }
+      },
+      "template": "datagram-client"
+    },
+    {
+      "id": "datagrams.server-sized-one",
+      "title": "Browser receives a one-byte server WebTransport datagram",
+      "wtUrl": "https://127.0.0.1:{port}/baton?version=0&baton=251&count=1&padding=0&datagram_size=1",
+      "datagramReceiveMode": "length",
+      "coverage": [
+        "constructor",
+        "ready",
+        "closed",
+        "Origin-header",
+        "origin-policy-allow",
+        "WT-Protocol",
+        "session-diagnostics",
+        "datagram-receive",
+        "datagram-server-send",
+        "one-byte-datagram-receive",
+        "datagram-payload-length",
+        "new-stream-after-close"
+      ],
+      "expect": {
+        "datagramReceiveMode": "length",
+        "datagramLengths": [
+          1
+        ],
+        "eventsInclude": [
+          "ready",
+          "received 251 on remote-uni",
+          "datagram sent",
+          "sent 252",
+          "datagram length 1",
+          "received 253 on local-bidi",
+          "sent 254",
+          "received 255 on remote-bidi",
+          "sent 0",
+          "closed"
+        ]
+      },
+      "template": "datagram-server"
+    },
+    {
+      "id": "datagrams.server-sized-large",
+      "title": "Browser receives a 1200-byte server WebTransport datagram",
+      "wtUrl": "https://127.0.0.1:{port}/baton?version=0&baton=251&count=1&padding=0&datagram_size=1200",
+      "datagramReceiveMode": "length",
+      "coverage": [
+        "constructor",
+        "ready",
+        "closed",
+        "Origin-header",
+        "origin-policy-allow",
+        "WT-Protocol",
+        "session-diagnostics",
+        "datagram-receive",
+        "datagram-server-send",
+        "large-near-max-datagram-receive",
+        "datagram-payload-length",
+        "new-stream-after-close"
+      ],
+      "expect": {
+        "datagramReceiveMode": "length",
+        "datagramLengths": [
+          1200
+        ],
+        "eventsInclude": [
+          "ready",
+          "received 251 on remote-uni",
+          "datagram sent",
+          "sent 252",
+          "datagram length 1200",
+          "received 253 on local-bidi",
+          "sent 254",
+          "received 255 on remote-bidi",
+          "sent 0",
+          "closed"
+        ]
+      },
+      "template": "datagram-server"
+    },
+    {
+      "id": "datagrams.server-repeat-one",
+      "title": "Browser receives sixteen one-byte server WebTransport datagrams",
+      "wtUrl": "https://127.0.0.1:{port}/baton?version=0&baton=251&count=1&padding=0&datagram_size=1&datagram_count=16",
+      "datagramReceiveMode": "length",
+      "coverage": [
+        "constructor",
+        "ready",
+        "closed",
+        "Origin-header",
+        "origin-policy-allow",
+        "WT-Protocol",
+        "session-diagnostics",
+        "datagram-receive",
+        "datagram-server-send",
+        "one-byte-datagram-receive",
+        "repeated-datagram-receive",
+        "datagram-count-16",
+        "datagram-payload-length",
+        "new-stream-after-close"
+      ],
+      "expect": {
+        "datagramReceiveMode": "length",
+        "datagramLengthsMin": 16,
+        "datagramLength": 1,
+        "eventsInclude": [
+          "ready",
+          "received 251 on remote-uni",
+          "datagram sent",
+          "sent 252",
+          "datagram length 1",
+          "received 253 on local-bidi",
+          "sent 254",
+          "received 255 on remote-bidi",
+          "sent 0",
+          "closed"
+        ]
+      },
+      "template": "datagram-server"
+    },
+    {
+      "id": "datagrams.server-repeat-large",
+      "title": "Browser receives sixteen 1200-byte server WebTransport datagrams",
+      "wtUrl": "https://127.0.0.1:{port}/baton?version=0&baton=251&count=1&padding=0&datagram_size=1200&datagram_count=16",
+      "datagramReceiveMode": "length",
+      "coverage": [
+        "constructor",
+        "ready",
+        "closed",
+        "Origin-header",
+        "origin-policy-allow",
+        "WT-Protocol",
+        "session-diagnostics",
+        "datagram-receive",
+        "datagram-server-send",
+        "large-near-max-datagram-receive",
+        "repeated-datagram-receive",
+        "datagram-count-16",
+        "datagram-payload-length",
+        "new-stream-after-close"
+      ],
+      "expect": {
+        "datagramReceiveMode": "length",
+        "datagramLengthsMin": 16,
+        "datagramLength": 1200,
+        "eventsInclude": [
+          "ready",
+          "received 251 on remote-uni",
+          "datagram sent",
+          "sent 252",
+          "datagram length 1200",
+          "received 253 on local-bidi",
+          "sent 254",
+          "received 255 on remote-bidi",
+          "sent 0",
+          "closed"
+        ]
+      },
+      "template": "datagram-server"
+    },
+    {
+      "id": "datagrams.server-lossy-one",
+      "title": "Browser accepts loss-tolerant one-byte server WebTransport datagrams",
+      "wtUrl": "https://127.0.0.1:{port}/baton?version=0&baton=251&count=1&padding=0&datagram_size=1&datagram_count=64&lossy=1",
+      "datagramReceiveMode": "length",
+      "coverage": [
+        "constructor",
+        "ready",
+        "closed",
+        "Origin-header",
+        "origin-policy-allow",
+        "WT-Protocol",
+        "session-diagnostics",
+        "datagram-receive",
+        "datagram-server-send",
+        "one-byte-datagram-receive",
+        "repeated-datagram-receive",
+        "datagram-loss-tolerated",
+        "datagram-ordering-not-assumed",
+        "datagram-payload-length",
+        "new-stream-after-close"
+      ],
+      "expect": {
+        "datagramReceiveMode": "length",
+        "datagramLengthsMin": 1,
+        "datagramLength": 1,
+        "eventsInclude": [
+          "ready",
+          "received 251 on remote-uni",
+          "datagram sent",
+          "sent 252",
+          "datagram length 1",
+          "received 253 on local-bidi",
+          "sent 254",
+          "received 255 on remote-bidi",
+          "sent 0",
+          "closed"
+        ]
+      },
+      "template": "datagram-server"
+    },
+    {
+      "id": "datagrams.server-burst-one",
+      "title": "Browser accepts a 1000-attempt burst of one-byte server WebTransport datagrams",
+      "wtUrl": "https://127.0.0.1:{port}/baton?version=0&baton=251&count=1&padding=0&datagram_size=1&datagram_count=1000",
+      "datagramReceiveMode": "length",
+      "coverage": [
+        "constructor",
+        "ready",
+        "closed",
+        "Origin-header",
+        "origin-policy-allow",
+        "WT-Protocol",
+        "session-diagnostics",
+        "datagram-receive",
+        "datagram-server-send",
+        "one-byte-datagram-receive",
+        "repeated-datagram-receive",
+        "datagram-burst-1000",
+        "datagram-count-1000",
+        "datagram-loss-tolerated",
+        "datagram-ordering-not-assumed",
+        "datagram-payload-length",
+        "new-stream-after-close"
+      ],
+      "expect": {
+        "datagramReceiveMode": "length",
+        "datagramLengthsMin": 1,
+        "datagramLength": 1,
+        "eventsInclude": [
+          "ready",
+          "received 251 on remote-uni",
+          "datagram sent",
+          "sent 252",
+          "datagram length 1",
+          "received 253 on local-bidi",
+          "sent 254",
+          "received 255 on remote-bidi",
+          "sent 0",
+          "closed"
+        ]
+      },
+      "template": "datagram-server"
+    },
+    {
+      "id": "datagrams.client-sized-one",
+      "title": "Server receives a one-byte browser WebTransport datagram",
+      "wtUrl": "https://127.0.0.1:{port}/baton?version=0&baton=251&count=1&padding=0&client_datagram_size=1",
+      "datagramSendMode": "length",
+      "datagramSendSize": 1,
+      "coverage": [
+        "constructor",
+        "ready",
+        "closed",
+        "Origin-header",
+        "origin-policy-allow",
+        "WT-Protocol",
+        "session-diagnostics",
+        "datagram-send",
+        "datagram-client-send",
+        "one-byte-datagram-send",
+        "server-datagram-byte-trace",
+        "new-stream-after-close"
+      ],
+      "expect": {
+        "datagramSendMode": "length",
+        "datagramSendSize": 1,
+        "datagramsSent": 1,
+        "eventsInclude": [
+          "ready",
+          "received 251 on remote-uni",
+          "datagram sent length 1",
+          "sent 252",
+          "datagram 252",
+          "received 253 on local-bidi",
+          "sent 254",
+          "received 255 on remote-bidi",
+          "sent 0",
+          "closed"
+        ],
+        "server": {
+          "sizedDatagramsReceivedMin": 1,
+          "datagramBytesReceivedMin": 1
+        }
+      },
+      "template": "datagram-client"
+    },
+    {
+      "id": "datagrams.client-sized-large",
+      "title": "Server receives a 1200-byte browser WebTransport datagram",
+      "wtUrl": "https://127.0.0.1:{port}/baton?version=0&baton=251&count=1&padding=0&client_datagram_size=1200",
+      "datagramSendMode": "length",
+      "datagramSendSize": 1200,
+      "coverage": [
+        "constructor",
+        "ready",
+        "closed",
+        "Origin-header",
+        "origin-policy-allow",
+        "WT-Protocol",
+        "session-diagnostics",
+        "datagram-send",
+        "datagram-client-send",
+        "large-near-max-datagram-send",
+        "server-datagram-byte-trace",
+        "new-stream-after-close"
+      ],
+      "expect": {
+        "datagramSendMode": "length",
+        "datagramSendSize": 1200,
+        "datagramsSent": 1,
+        "eventsInclude": [
+          "ready",
+          "received 251 on remote-uni",
+          "datagram sent length 1200",
+          "sent 252",
+          "datagram 252",
+          "received 253 on local-bidi",
+          "sent 254",
+          "received 255 on remote-bidi",
+          "sent 0",
+          "closed"
+        ],
+        "server": {
+          "sizedDatagramsReceivedMin": 1,
+          "datagramBytesReceivedMin": 1200
+        }
+      },
+      "template": "datagram-client"
+    },
+    {
+      "id": "datagrams.client-repeat-one",
+      "title": "Server receives repeated one-byte browser WebTransport datagrams",
+      "wtUrl": "https://127.0.0.1:{port}/baton?version=0&baton=251&count=1&padding=0&client_datagram_size=1",
+      "datagramSendMode": "length",
+      "datagramSendSize": 1,
+      "datagramSendCount": 16,
+      "coverage": [
+        "constructor",
+        "ready",
+        "closed",
+        "Origin-header",
+        "origin-policy-allow",
+        "WT-Protocol",
+        "session-diagnostics",
+        "datagram-send",
+        "datagram-client-send",
+        "one-byte-datagram-send",
+        "repeated-datagram-send",
+        "datagram-count-16",
+        "server-datagram-byte-trace",
+        "new-stream-after-close"
+      ],
+      "expect": {
+        "datagramSendMode": "length",
+        "datagramSendSize": 1,
+        "datagramSendCount": 16,
+        "datagramsSent": 16,
+        "eventsInclude": [
+          "ready",
+          "received 251 on remote-uni",
+          "datagram sent length 1",
+          "sent 252",
+          "datagram 252",
+          "received 253 on local-bidi",
+          "sent 254",
+          "received 255 on remote-bidi",
+          "sent 0",
+          "closed"
+        ],
+        "server": {
+          "sizedDatagramsReceivedMin": 16,
+          "datagramBytesReceivedMin": 16
+        }
+      },
+      "template": "datagram-client"
+    },
+    {
+      "id": "datagrams.client-repeat-large",
+      "title": "Server receives repeated 1200-byte browser WebTransport datagrams",
+      "wtUrl": "https://127.0.0.1:{port}/baton?version=0&baton=251&count=1&padding=0&client_datagram_size=1200",
+      "datagramSendMode": "length",
+      "datagramSendSize": 1200,
+      "datagramSendCount": 16,
+      "coverage": [
+        "constructor",
+        "ready",
+        "closed",
+        "Origin-header",
+        "origin-policy-allow",
+        "WT-Protocol",
+        "session-diagnostics",
+        "datagram-send",
+        "datagram-client-send",
+        "large-near-max-datagram-send",
+        "repeated-datagram-send",
+        "datagram-count-16",
+        "server-datagram-byte-trace",
+        "new-stream-after-close"
+      ],
+      "expect": {
+        "datagramSendMode": "length",
+        "datagramSendSize": 1200,
+        "datagramSendCount": 16,
+        "datagramsSent": 16,
+        "eventsInclude": [
+          "ready",
+          "received 251 on remote-uni",
+          "datagram sent length 1200",
+          "sent 252",
+          "datagram 252",
+          "received 253 on local-bidi",
+          "sent 254",
+          "received 255 on remote-bidi",
+          "sent 0",
+          "closed"
+        ],
+        "server": {
+          "sizedDatagramsReceivedMin": 16,
+          "datagramBytesReceivedMin": 19200
+        }
+      },
+      "template": "datagram-client"
+    },
+    {
+      "id": "baton.core.short-padded-default-reader",
+      "title": "Baton stream/datagram/protocol exchange with short padded packets",
+      "wtUrl": "https://127.0.0.1:{port}/baton?version=0&baton=251&count=1&padding=63",
+      "requireDatagram": true,
+      "useByob": false,
+      "coverage": [
+        "constructor",
+        "URL-constructor",
+        "constructor-options-observed",
+        "allowPooling-serverCertificateHashes-observed",
+        "ready",
+        "closed",
+        "Origin-header",
+        "origin-policy-allow",
+        "WT-Protocol",
+        "session-diagnostics",
+        "default-reader",
+        "short-padded-baton-packet",
+        "one-byte-padding-varint",
+        "incoming-unidirectional-stream",
+        "incoming-bidirectional-stream",
+        "outgoing-unidirectional-stream",
+        "stream-bad-chunk",
+        "unidirectional-stream-bad-chunk",
+        "outgoing-bidirectional-stream",
+        "bidirectional-stream-bad-chunk",
+        "datagram-send",
+        "datagram-bad-chunk",
+        "datagram-receive",
+        "new-stream-after-close",
+        "browser-close",
+        "close-capsule"
+      ],
+      "expect": {
+        "requireDatagram": true,
+        "constructorRequireUnreliable": true,
+        "useByob": false,
+        "received": [
+          251,
+          253,
+          255
+        ],
+        "sent": [
+          252,
+          254,
+          0
+        ],
+        "datagramsReceived": [
+          252
+        ],
+        "eventsInclude": [
+          "ready",
+          "received 251 on remote-uni",
+          "datagram sent",
+          "sent 252",
+          "datagram 252",
+          "received 253 on local-bidi",
+          "sent 254",
+          "received 255 on remote-bidi",
+          "sent 0",
+          "closed"
+        ],
+        "datagramWritableTestsInclude": [
+          "string-chunk"
+        ],
+        "streamWritableTestsInclude": [
+          "unidirectional-string-chunk",
+          "bidirectional-string-chunk"
+        ],
+        "server": {
+          "zeroBatonReceivedMin": 1
+        }
+      },
+      "template": "positive-baton-diagnostic"
+    },
+    {
+      "id": "baton.core.varint-boundary-padded-default-reader",
+      "title": "Baton stream/datagram/protocol exchange at padding varint boundary",
+      "wtUrl": "https://127.0.0.1:{port}/baton?version=0&baton=251&count=1&padding=64",
+      "requireDatagram": true,
+      "useByob": false,
+      "coverage": [
+        "constructor",
+        "URL-constructor",
+        "constructor-options-observed",
+        "allowPooling-serverCertificateHashes-observed",
+        "ready",
+        "closed",
+        "Origin-header",
+        "origin-policy-allow",
+        "WT-Protocol",
+        "session-diagnostics",
+        "default-reader",
+        "boundary-padded-baton-packet",
+        "two-byte-padding-varint",
+        "two-byte-padding-varint-boundary",
+        "incoming-unidirectional-stream",
+        "incoming-bidirectional-stream",
+        "outgoing-unidirectional-stream",
+        "stream-bad-chunk",
+        "unidirectional-stream-bad-chunk",
+        "outgoing-bidirectional-stream",
+        "bidirectional-stream-bad-chunk",
+        "datagram-send",
+        "datagram-bad-chunk",
+        "datagram-receive",
+        "new-stream-after-close",
+        "browser-close",
+        "close-capsule"
+      ],
+      "expect": {
+        "requireDatagram": true,
+        "constructorRequireUnreliable": true,
+        "useByob": false,
+        "received": [
+          251,
+          253,
+          255
+        ],
+        "sent": [
+          252,
+          254,
+          0
+        ],
+        "datagramsReceived": [
+          252
+        ],
+        "eventsInclude": [
+          "ready",
+          "received 251 on remote-uni",
+          "datagram sent",
+          "sent 252",
+          "datagram 252",
+          "received 253 on local-bidi",
+          "sent 254",
+          "received 255 on remote-bidi",
+          "sent 0",
+          "closed"
+        ],
+        "datagramWritableTestsInclude": [
+          "string-chunk"
+        ],
+        "streamWritableTestsInclude": [
+          "unidirectional-string-chunk",
+          "bidirectional-string-chunk"
+        ],
+        "server": {
+          "zeroBatonReceivedMin": 1
+        }
+      },
+      "template": "positive-baton-diagnostic"
+    },
+    {
+      "id": "baton.core.medium-padded-default-reader",
+      "title": "Baton stream/datagram/protocol exchange with medium padded packets",
+      "wtUrl": "https://127.0.0.1:{port}/baton?version=0&baton=251&count=1&padding=1200",
+      "requireDatagram": true,
+      "useByob": false,
+      "coverage": [
+        "constructor",
+        "URL-constructor",
+        "constructor-options-observed",
+        "allowPooling-serverCertificateHashes-observed",
+        "ready",
+        "closed",
+        "Origin-header",
+        "origin-policy-allow",
+        "WT-Protocol",
+        "session-diagnostics",
+        "default-reader",
+        "medium-padded-baton-packet",
+        "two-byte-padding-varint",
+        "stream-fragmented-data",
+        "stream-readable-completion",
+        "incoming-unidirectional-stream",
+        "incoming-bidirectional-stream",
+        "outgoing-unidirectional-stream",
+        "stream-bad-chunk",
+        "unidirectional-stream-bad-chunk",
+        "outgoing-bidirectional-stream",
+        "bidirectional-stream-bad-chunk",
+        "datagram-send",
+        "datagram-bad-chunk",
+        "datagram-receive",
+        "new-stream-after-close",
+        "browser-close",
+        "close-capsule"
+      ],
+      "expect": {
+        "requireDatagram": true,
+        "constructorRequireUnreliable": true,
+        "useByob": false,
+        "received": [
+          251,
+          253,
+          255
+        ],
+        "sent": [
+          252,
+          254,
+          0
+        ],
+        "datagramsReceived": [
+          252
+        ],
+        "eventsInclude": [
+          "ready",
+          "received 251 on remote-uni",
+          "datagram sent",
+          "sent 252",
+          "datagram 252",
+          "received 253 on local-bidi",
+          "sent 254",
+          "received 255 on remote-bidi",
+          "sent 0",
+          "closed"
+        ],
+        "datagramWritableTestsInclude": [
+          "string-chunk"
+        ],
+        "streamWritableTestsInclude": [
+          "unidirectional-string-chunk",
+          "bidirectional-string-chunk"
+        ],
+        "server": {
+          "zeroBatonReceivedMin": 1
+        }
+      },
+      "template": "positive-baton-diagnostic"
+    },
+    {
+      "id": "baton.stream.max-padded-default-reader",
+      "title": "Baton stream exchange with maximum current padded packets",
+      "wtUrl": "https://127.0.0.1:{port}/baton?version=0&baton=251&count=1&padding=16383",
+      "timeoutMs": 45000,
+      "coverage": [
+        "constructor",
+        "ready",
+        "closed",
+        "Origin-header",
+        "origin-policy-allow",
+        "WT-Protocol",
+        "session-diagnostics",
+        "default-reader",
+        "max-current-baton-padding",
+        "stream-fragmented-data",
+        "stream-max-current-baton-payload",
+        "stream-fin-after-data",
+        "stream-readable-completion",
+        "incoming-unidirectional-stream",
+        "incoming-bidirectional-stream",
+        "outgoing-unidirectional-stream",
+        "outgoing-bidirectional-stream",
+        "datagram-send",
+        "datagram-receive",
+        "new-stream-after-close",
+        "browser-close",
+        "close-capsule"
+      ],
+      "expect": {
+        "received": [
+          251,
+          253,
+          255
+        ],
+        "sent": [
+          252,
+          254,
+          0
+        ],
+        "datagramsReceived": [
+          252
+        ],
+        "server": {
+          "zeroBatonReceivedMin": 1
+        }
+      },
+      "template": "positive-baton-stream"
+    },
+    {
+      "id": "baton.core.two-lane-compact-default-reader",
+      "title": "Baton stream/datagram/protocol exchange with two compact lanes",
+      "wtUrl": "https://127.0.0.1:{port}/baton?version=0&baton=251&count=2&padding=0",
+      "requireDatagram": true,
+      "useByob": false,
+      "coverage": [
+        "constructor",
+        "URL-constructor",
+        "constructor-options-observed",
+        "allowPooling-serverCertificateHashes-observed",
+        "ready",
+        "closed",
+        "Origin-header",
+        "origin-policy-allow",
+        "WT-Protocol",
+        "session-diagnostics",
+        "default-reader",
+        "two-lane-baton",
+        "concurrent-incoming-unidirectional-streams",
+        "concurrent-incoming-bidirectional-streams",
+        "concurrent-outgoing-unidirectional-streams",
+        "concurrent-outgoing-bidirectional-streams",
+        "stream-bad-chunk",
+        "unidirectional-stream-bad-chunk",
+        "bidirectional-stream-bad-chunk",
+        "datagram-send",
+        "datagram-bad-chunk",
+        "datagram-receive",
+        "new-stream-after-close",
+        "browser-close",
+        "close-capsule"
+      ],
+      "expect": {
+        "requireDatagram": true,
+        "constructorRequireUnreliable": true,
+        "useByob": false,
+        "sequenceOrderMatters": false,
+        "received": [
+          251,
+          251,
+          253,
+          253,
+          255,
+          255
+        ],
+        "sent": [
+          252,
+          252,
+          254,
+          254,
+          0,
+          0
+        ],
+        "datagramsReceivedMin": 1,
+        "eventsInclude": [
+          "ready",
+          "received 251 on remote-uni",
+          "datagram sent",
+          "sent 252",
+          "datagram 252",
+          "received 253 on local-bidi",
+          "sent 254",
+          "received 255 on remote-bidi",
+          "sent 0",
+          "closed"
+        ],
+        "datagramWritableTestsInclude": [
+          "string-chunk"
+        ],
+        "streamWritableTestsInclude": [
+          "unidirectional-string-chunk",
+          "bidirectional-string-chunk"
+        ],
+        "server": {
+          "zeroBatonReceivedMin": 2
+        }
+      },
+      "template": "positive-baton-diagnostic"
+    },
+    {
+      "id": "baton.core.four-lane-compact-default-reader",
+      "title": "Baton stream/datagram/protocol exchange with four compact lanes",
+      "wtUrl": "https://127.0.0.1:{port}/baton?version=0&baton=251&count=4&padding=0",
+      "requireDatagram": true,
+      "useByob": false,
+      "coverage": [
+        "constructor",
+        "URL-constructor",
+        "constructor-options-observed",
+        "allowPooling-serverCertificateHashes-observed",
+        "ready",
+        "closed",
+        "Origin-header",
+        "origin-policy-allow",
+        "WT-Protocol",
+        "session-diagnostics",
+        "default-reader",
+        "four-lane-baton",
+        "stream-interleaving",
+        "many-concurrent-incoming-unidirectional-streams",
+        "many-concurrent-incoming-bidirectional-streams",
+        "many-concurrent-outgoing-unidirectional-streams",
+        "many-concurrent-outgoing-bidirectional-streams",
+        "stream-bad-chunk",
+        "unidirectional-stream-bad-chunk",
+        "bidirectional-stream-bad-chunk",
+        "datagram-send",
+        "datagram-bad-chunk",
+        "datagram-receive",
+        "new-stream-after-close",
+        "browser-close",
+        "close-capsule"
+      ],
+      "expect": {
+        "requireDatagram": true,
+        "constructorRequireUnreliable": true,
+        "useByob": false,
+        "sequenceOrderMatters": false,
+        "received": [
+          251,
+          251,
+          251,
+          251,
+          253,
+          253,
+          253,
+          253,
+          255,
+          255,
+          255,
+          255
+        ],
+        "sent": [
+          252,
+          252,
+          252,
+          252,
+          254,
+          254,
+          254,
+          254,
+          0,
+          0,
+          0,
+          0
+        ],
+        "datagramsReceivedMin": 1,
+        "eventsInclude": [
+          "ready",
+          "received 251 on remote-uni",
+          "datagram sent",
+          "sent 252",
+          "datagram 252",
+          "received 253 on local-bidi",
+          "sent 254",
+          "received 255 on remote-bidi",
+          "sent 0",
+          "closed"
+        ],
+        "datagramWritableTestsInclude": [
+          "string-chunk"
+        ],
+        "streamWritableTestsInclude": [
+          "unidirectional-string-chunk",
+          "bidirectional-string-chunk"
+        ],
+        "server": {
+          "zeroBatonReceivedMin": 4
+        }
+      },
+      "template": "positive-baton-diagnostic"
+    },
+    {
+      "id": "baton.stream.sixteen-lane-compact-default-reader",
+      "title": "Baton stream/datagram/protocol exchange with sixteen compact lanes",
+      "wtUrl": "https://127.0.0.1:{port}/baton?version=0&baton=251&count=16&padding=0",
+      "timeoutMs": 60000,
+      "coverage": [
+        "constructor",
+        "ready",
+        "closed",
+        "Origin-header",
+        "origin-policy-allow",
+        "WT-Protocol",
+        "session-diagnostics",
+        "default-reader",
+        "sixteen-lane-baton",
+        "stream-server-open-uni-count-16",
+        "stream-server-open-bidi-count-16",
+        "stream-interleaving",
+        "many-concurrent-incoming-unidirectional-streams",
+        "many-concurrent-incoming-bidirectional-streams",
+        "many-concurrent-outgoing-unidirectional-streams",
+        "many-concurrent-outgoing-bidirectional-streams",
+        "stream-fin-after-data",
+        "stream-readable-completion",
+        "datagram-send",
+        "datagram-receive",
+        "new-stream-after-close",
+        "browser-close",
+        "close-capsule"
+      ],
+      "expect": {
+        "sequenceOrderMatters": false,
+        "received": [
+          251,
+          251,
+          251,
+          251,
+          251,
+          251,
+          251,
+          251,
+          251,
+          251,
+          251,
+          251,
+          251,
+          251,
+          251,
+          251,
+          253,
+          253,
+          253,
+          253,
+          253,
+          253,
+          253,
+          253,
+          253,
+          253,
+          253,
+          253,
+          253,
+          253,
+          253,
+          253,
+          255,
+          255,
+          255,
+          255,
+          255,
+          255,
+          255,
+          255,
+          255,
+          255,
+          255,
+          255,
+          255,
+          255,
+          255,
+          255
+        ],
+        "sent": [
+          252,
+          252,
+          252,
+          252,
+          252,
+          252,
+          252,
+          252,
+          252,
+          252,
+          252,
+          252,
+          252,
+          252,
+          252,
+          252,
+          254,
+          254,
+          254,
+          254,
+          254,
+          254,
+          254,
+          254,
+          254,
+          254,
+          254,
+          254,
+          254,
+          254,
+          254,
+          254,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "datagramsReceivedMin": 1,
+        "server": {
+          "zeroBatonReceivedMin": 16
+        }
+      },
+      "template": "positive-baton-stream"
+    },
+    {
+      "id": "streams.large-bidi-echo-10mb",
+      "title": "Browser sends and receives a 10MB bidirectional stream payload",
+      "wtUrl": "https://127.0.0.1:{port}/baton?version=0&stream=client-bidi-echo&stream_size=10485760&stream_count=1",
+      "streamMode": "client-bidi-echo",
+      "streamSize": 10485760,
+      "timeoutMs": 60000,
+      "coverage": [
+        "constructor",
+        "ready",
+        "closed",
+        "Origin-header",
+        "origin-policy-allow",
+        "WT-Protocol",
+        "session-diagnostics",
+        "stream-client-bidi-large",
+        "stream-large-bidi-10mb",
+        "stream-exact-byte-count",
+        "stream-fin-after-data",
+        "stream-readable-completion",
+        "stream-server-fin-trace"
+      ],
+      "expect": {
+        "streamMode": "client-bidi-echo",
+        "streamSize": 10485760,
+        "streamBytesSent": 10485760,
+        "streamBytesReceived": 10485760,
+        "streamFinSent": 1,
+        "eventsInclude": [
+          "ready",
+          "stream sent 10485760",
+          "stream received 10485760 on client-bidi-0",
+          "closed"
+        ],
+        "sessionDiagnosticsOk": true,
+        "sessionDiagnosticsTestsInclude": [
+          "ready-promise",
+          "closed-promise",
+          "protocol-property",
+          "incoming-bidirectional-readable",
+          "incoming-unidirectional-readable",
+          "create-bidirectional-stream-function",
+          "create-unidirectional-stream-function"
+        ],
+        "server": {
+          "streamTestBytesReceived": 10485760,
+          "streamTestBytesSent": 10485760,
+          "streamTestFinReceived": 1
+        }
+      },
+      "template": "stream-transfer"
+    },
+    {
+      "id": "streams.large-uni-reply-10mb",
+      "title": "Browser sends a 10MB unidirectional stream and receives a 10MB server reply",
+      "wtUrl": "https://127.0.0.1:{port}/baton?version=0&stream=client-uni-reply&stream_size=10485760&stream_count=1",
+      "streamMode": "client-uni-reply",
+      "streamSize": 10485760,
+      "timeoutMs": 60000,
+      "coverage": [
+        "constructor",
+        "ready",
+        "closed",
+        "Origin-header",
+        "origin-policy-allow",
+        "WT-Protocol",
+        "session-diagnostics",
+        "stream-client-uni-large",
+        "stream-large-uni-10mb",
+        "stream-exact-byte-count",
+        "stream-fin-after-data",
+        "stream-readable-completion",
+        "stream-server-fin-trace"
+      ],
+      "expect": {
+        "streamMode": "client-uni-reply",
+        "streamSize": 10485760,
+        "streamBytesSent": 10485760,
+        "streamBytesReceived": 10485760,
+        "streamFinSent": 1,
+        "eventsInclude": [
+          "ready",
+          "stream sent 10485760",
+          "stream received 10485760 on client-uni-reply-0",
+          "closed"
+        ],
+        "sessionDiagnosticsOk": true,
+        "sessionDiagnosticsTestsInclude": [
+          "ready-promise",
+          "closed-promise",
+          "protocol-property",
+          "incoming-unidirectional-readable",
+          "incoming-bidirectional-readable",
+          "create-unidirectional-stream-function"
+        ],
+        "server": {
+          "streamTestBytesReceived": 10485760,
+          "streamTestBytesSent": 10485760,
+          "streamTestFinReceived": 1
+        }
+      },
+      "template": "stream-transfer"
+    },
+    {
+      "id": "streams.fin-empty-bidi",
+      "title": "Browser bidirectional stream can carry FIN with no payload",
+      "wtUrl": "https://127.0.0.1:{port}/baton?version=0&stream=client-bidi-echo&stream_size=0&stream_count=1",
+      "streamMode": "client-bidi-echo",
+      "streamSize": 0,
+      "timeoutMs": 30000,
+      "coverage": [
+        "constructor",
+        "ready",
+        "closed",
+        "stream-fin-empty",
+        "stream-zero-byte",
+        "stream-echo-bidi",
+        "stream-readable-completion",
+        "stream-server-fin-trace"
+      ],
+      "expect": {
+        "streamMode": "client-bidi-echo",
+        "streamSize": 0,
+        "streamBytesSent": 0,
+        "streamBytesReceived": 0,
+        "streamFinSent": 1,
+        "eventsInclude": [
+          "ready",
+          "stream sent 0",
+          "stream received 0 on client-bidi-0",
+          "closed"
+        ],
+        "server": {
+          "streamTestBytesReceived": 0,
+          "streamTestBytesSent": 0,
+          "streamTestFinReceived": 1
+        }
+      },
+      "template": "stream-transfer"
+    },
+    {
+      "id": "streams.fin-empty-uni",
+      "title": "Browser unidirectional stream can carry FIN with no payload",
+      "wtUrl": "https://127.0.0.1:{port}/baton?version=0&stream=client-uni-reply&stream_size=0&stream_count=1",
+      "streamMode": "client-uni-reply",
+      "streamSize": 0,
+      "timeoutMs": 30000,
+      "coverage": [
+        "constructor",
+        "ready",
+        "closed",
+        "stream-fin-empty",
+        "stream-zero-byte",
+        "stream-echo-uni",
+        "stream-readable-completion",
+        "stream-server-fin-trace"
+      ],
+      "expect": {
+        "streamMode": "client-uni-reply",
+        "streamSize": 0,
+        "streamBytesSent": 0,
+        "streamBytesReceived": 0,
+        "streamFinSent": 1,
+        "eventsInclude": [
+          "ready",
+          "stream sent 0",
+          "stream received 0 on client-uni-reply-0",
+          "closed"
+        ],
+        "server": {
+          "streamTestBytesReceived": 0,
+          "streamTestBytesSent": 0,
+          "streamTestFinReceived": 1
+        }
+      },
+      "template": "stream-transfer"
+    },
+    {
+      "id": "streams.server-open-uni-zero",
+      "title": "Server opens a zero-byte unidirectional stream",
+      "wtUrl": "https://127.0.0.1:{port}/baton?version=0&stream=server-uni&stream_size=0&stream_count=1",
+      "streamMode": "server-uni",
+      "streamSize": 0,
+      "timeoutMs": 30000,
+      "coverage": [
+        "constructor",
+        "ready",
+        "closed",
+        "stream-server-open-uni-count-1",
+        "stream-fin-empty",
+        "stream-zero-byte",
+        "stream-readable-completion",
+        "stream-server-fin-trace"
+      ],
+      "expect": {
+        "streamMode": "server-uni",
+        "streamSize": 0,
+        "streamBytesSent": 0,
+        "streamBytesReceived": 0,
+        "streamFinSent": 0,
+        "eventsInclude": [
+          "ready",
+          "stream received 0 on server-uni-0",
+          "closed"
+        ],
+        "server": {
+          "streamTestBytesReceived": 0,
+          "streamTestBytesSent": 0,
+          "streamTestFinReceived": 0
+        }
+      },
+      "template": "stream-transfer"
+    },
+    {
+      "id": "streams.server-open-bidi-zero",
+      "title": "Server opens a zero-byte bidirectional stream",
+      "wtUrl": "https://127.0.0.1:{port}/baton?version=0&stream=server-bidi&stream_size=0&stream_count=1",
+      "streamMode": "server-bidi",
+      "streamSize": 0,
+      "timeoutMs": 30000,
+      "coverage": [
+        "constructor",
+        "ready",
+        "closed",
+        "stream-server-open-bidi-count-1",
+        "stream-fin-empty",
+        "stream-zero-byte",
+        "stream-readable-completion",
+        "stream-server-fin-trace"
+      ],
+      "expect": {
+        "streamMode": "server-bidi",
+        "streamSize": 0,
+        "streamBytesSent": 0,
+        "streamBytesReceived": 0,
+        "streamFinSent": 1,
+        "eventsInclude": [
+          "ready",
+          "stream sent 0 on server-bidi-0-reply",
+          "stream received 0 on server-bidi-0",
+          "closed"
+        ],
+        "server": {
+          "streamTestBytesReceived": 0,
+          "streamTestBytesSent": 0,
+          "streamTestFinReceived": 1
+        }
+      },
+      "template": "stream-transfer"
+    },
+    {
+      "id": "streams.endpoint-echo-bidi",
+      "title": "Dedicated endpoint echoes a 64-byte browser bidirectional stream",
+      "wtUrl": "https://127.0.0.1:{port}/wt/stream/echo-bidi?stream_size=64&stream_count=1",
+      "streamMode": "client-bidi-echo",
+      "streamSize": 64,
+      "timeoutMs": 30000,
+      "coverage": [
+        "constructor",
+        "ready",
+        "closed",
+        "stream-echo-bidi",
+        "stream-exact-byte-count",
+        "stream-readable-completion",
+        "stream-server-fin-trace",
+        "stream-dedicated-endpoint",
+        "stream-dedicated-echo-bidi"
+      ],
+      "expect": {
+        "streamMode": "client-bidi-echo",
+        "streamSize": 64,
+        "streamBytesSent": 64,
+        "streamBytesReceived": 64,
+        "streamFinSent": 1,
+        "eventsInclude": [
+          "ready",
+          "stream sent 64",
+          "stream received 64 on client-bidi-0",
+          "closed"
+        ],
+        "server": {
+          "streamTestBytesReceived": 64,
+          "streamTestBytesSent": 64,
+          "streamTestFinReceived": 1
+        }
+      },
+      "template": "stream-transfer"
+    },
+    {
+      "id": "streams.endpoint-echo-uni",
+      "title": "Dedicated endpoint replies to a 64-byte browser unidirectional stream",
+      "wtUrl": "https://127.0.0.1:{port}/wt/stream/echo-uni?stream_size=64&stream_count=1",
+      "streamMode": "client-uni-reply",
+      "streamSize": 64,
+      "timeoutMs": 30000,
+      "coverage": [
+        "constructor",
+        "ready",
+        "closed",
+        "stream-echo-uni",
+        "stream-exact-byte-count",
+        "stream-readable-completion",
+        "stream-server-fin-trace",
+        "stream-dedicated-endpoint",
+        "stream-dedicated-echo-uni"
+      ],
+      "expect": {
+        "streamMode": "client-uni-reply",
+        "streamSize": 64,
+        "streamBytesSent": 64,
+        "streamBytesReceived": 64,
+        "streamFinSent": 1,
+        "eventsInclude": [
+          "ready",
+          "stream sent 64",
+          "stream received 64 on client-uni-reply-0",
+          "closed"
+        ],
+        "server": {
+          "streamTestBytesReceived": 64,
+          "streamTestBytesSent": 64,
+          "streamTestFinReceived": 1
+        }
+      },
+      "template": "stream-transfer"
+    },
+    {
+      "id": "streams.endpoint-large-bidi-10mb",
+      "title": "Dedicated endpoint echoes a 10MB browser bidirectional stream",
+      "wtUrl": "https://127.0.0.1:{port}/wt/stream/large-bidi?stream_size=10485760&stream_count=1",
+      "streamMode": "client-bidi-echo",
+      "streamSize": 10485760,
+      "timeoutMs": 60000,
+      "coverage": [
+        "constructor",
+        "ready",
+        "closed",
+        "Origin-header",
+        "origin-policy-allow",
+        "WT-Protocol",
+        "session-diagnostics",
+        "stream-client-bidi-large",
+        "stream-large-bidi-10mb",
+        "stream-exact-byte-count",
+        "stream-fin-after-data",
+        "stream-readable-completion",
+        "stream-server-fin-trace",
+        "stream-dedicated-endpoint",
+        "stream-dedicated-large-bidi"
+      ],
+      "expect": {
+        "streamMode": "client-bidi-echo",
+        "streamSize": 10485760,
+        "streamBytesSent": 10485760,
+        "streamBytesReceived": 10485760,
+        "streamFinSent": 1,
+        "eventsInclude": [
+          "ready",
+          "stream sent 10485760",
+          "stream received 10485760 on client-bidi-0",
+          "closed"
+        ],
+        "sessionDiagnosticsOk": true,
+        "sessionDiagnosticsTestsInclude": [
+          "ready-promise",
+          "closed-promise",
+          "protocol-property",
+          "incoming-bidirectional-readable",
+          "incoming-unidirectional-readable",
+          "create-bidirectional-stream-function",
+          "create-unidirectional-stream-function"
+        ],
+        "server": {
+          "streamTestBytesReceived": 10485760,
+          "streamTestBytesSent": 10485760,
+          "streamTestFinReceived": 1
+        }
+      },
+      "template": "stream-transfer"
+    },
+    {
+      "id": "streams.endpoint-large-uni-10mb",
+      "title": "Dedicated endpoint replies to a 10MB browser unidirectional stream",
+      "wtUrl": "https://127.0.0.1:{port}/wt/stream/large-uni?stream_size=10485760&stream_count=1",
+      "streamMode": "client-uni-reply",
+      "streamSize": 10485760,
+      "timeoutMs": 60000,
+      "coverage": [
+        "constructor",
+        "ready",
+        "closed",
+        "Origin-header",
+        "origin-policy-allow",
+        "WT-Protocol",
+        "session-diagnostics",
+        "stream-client-uni-large",
+        "stream-large-uni-10mb",
+        "stream-exact-byte-count",
+        "stream-fin-after-data",
+        "stream-readable-completion",
+        "stream-server-fin-trace",
+        "stream-dedicated-endpoint",
+        "stream-dedicated-large-uni"
+      ],
+      "expect": {
+        "streamMode": "client-uni-reply",
+        "streamSize": 10485760,
+        "streamBytesSent": 10485760,
+        "streamBytesReceived": 10485760,
+        "streamFinSent": 1,
+        "eventsInclude": [
+          "ready",
+          "stream sent 10485760",
+          "stream received 10485760 on client-uni-reply-0",
+          "closed"
+        ],
+        "sessionDiagnosticsOk": true,
+        "sessionDiagnosticsTestsInclude": [
+          "ready-promise",
+          "closed-promise",
+          "protocol-property",
+          "incoming-unidirectional-readable",
+          "incoming-bidirectional-readable",
+          "create-unidirectional-stream-function"
+        ],
+        "server": {
+          "streamTestBytesReceived": 10485760,
+          "streamTestBytesSent": 10485760,
+          "streamTestFinReceived": 1
+        }
+      },
+      "template": "stream-transfer"
+    },
+    {
+      "id": "streams.endpoint-fin-empty-bidi",
+      "title": "Dedicated endpoint accepts a bidirectional FIN with no payload",
+      "wtUrl": "https://127.0.0.1:{port}/wt/stream/fin-empty-bidi?stream_size=0&stream_count=1",
+      "streamMode": "client-bidi-echo",
+      "streamSize": 0,
+      "timeoutMs": 30000,
+      "coverage": [
+        "constructor",
+        "ready",
+        "closed",
+        "stream-fin-empty",
+        "stream-zero-byte",
+        "stream-echo-bidi",
+        "stream-readable-completion",
+        "stream-server-fin-trace",
+        "stream-dedicated-endpoint",
+        "stream-dedicated-fin-empty-bidi"
+      ],
+      "expect": {
+        "streamMode": "client-bidi-echo",
+        "streamSize": 0,
+        "streamBytesSent": 0,
+        "streamBytesReceived": 0,
+        "streamFinSent": 1,
+        "eventsInclude": [
+          "ready",
+          "stream sent 0",
+          "stream received 0 on client-bidi-0",
+          "closed"
+        ],
+        "server": {
+          "streamTestBytesReceived": 0,
+          "streamTestBytesSent": 0,
+          "streamTestFinReceived": 1
+        }
+      },
+      "template": "stream-transfer"
+    },
+    {
+      "id": "streams.endpoint-fin-empty-uni",
+      "title": "Dedicated endpoint accepts a unidirectional FIN with no payload",
+      "wtUrl": "https://127.0.0.1:{port}/wt/stream/fin-empty-uni?stream_size=0&stream_count=1",
+      "streamMode": "client-uni-reply",
+      "streamSize": 0,
+      "timeoutMs": 30000,
+      "coverage": [
+        "constructor",
+        "ready",
+        "closed",
+        "stream-fin-empty",
+        "stream-zero-byte",
+        "stream-echo-uni",
+        "stream-readable-completion",
+        "stream-server-fin-trace",
+        "stream-dedicated-endpoint",
+        "stream-dedicated-fin-empty-uni"
+      ],
+      "expect": {
+        "streamMode": "client-uni-reply",
+        "streamSize": 0,
+        "streamBytesSent": 0,
+        "streamBytesReceived": 0,
+        "streamFinSent": 1,
+        "eventsInclude": [
+          "ready",
+          "stream sent 0",
+          "stream received 0 on client-uni-reply-0",
+          "closed"
+        ],
+        "server": {
+          "streamTestBytesReceived": 0,
+          "streamTestBytesSent": 0,
+          "streamTestFinReceived": 1
+        }
+      },
+      "template": "stream-transfer"
+    },
+    {
+      "id": "streams.endpoint-server-open-uni-zero",
+      "title": "Dedicated endpoint opens a zero-byte server unidirectional stream",
+      "wtUrl": "https://127.0.0.1:{port}/wt/stream/server-open-uni?stream_size=0&stream_count=1",
+      "streamMode": "server-uni",
+      "streamSize": 0,
+      "timeoutMs": 30000,
+      "coverage": [
+        "constructor",
+        "ready",
+        "closed",
+        "stream-server-open-uni-count-1",
+        "stream-fin-empty",
+        "stream-zero-byte",
+        "stream-readable-completion",
+        "stream-server-fin-trace",
+        "stream-dedicated-endpoint",
+        "stream-dedicated-server-open-uni"
+      ],
+      "expect": {
+        "streamMode": "server-uni",
+        "streamSize": 0,
+        "streamBytesSent": 0,
+        "streamBytesReceived": 0,
+        "streamFinSent": 0,
+        "eventsInclude": [
+          "ready",
+          "stream received 0 on server-uni-0",
+          "closed"
+        ],
+        "server": {
+          "streamTestBytesReceived": 0,
+          "streamTestBytesSent": 0,
+          "streamTestFinReceived": 0
+        }
+      },
+      "template": "stream-transfer"
+    },
+    {
+      "id": "streams.endpoint-server-open-bidi-zero",
+      "title": "Dedicated endpoint opens a zero-byte server bidirectional stream",
+      "wtUrl": "https://127.0.0.1:{port}/wt/stream/server-open-bidi?stream_size=0&stream_count=1",
+      "streamMode": "server-bidi",
+      "streamSize": 0,
+      "timeoutMs": 30000,
+      "coverage": [
+        "constructor",
+        "ready",
+        "closed",
+        "stream-server-open-bidi-count-1",
+        "stream-fin-empty",
+        "stream-zero-byte",
+        "stream-readable-completion",
+        "stream-server-fin-trace",
+        "stream-dedicated-endpoint",
+        "stream-dedicated-server-open-bidi"
+      ],
+      "expect": {
+        "streamMode": "server-bidi",
+        "streamSize": 0,
+        "streamBytesSent": 0,
+        "streamBytesReceived": 0,
+        "streamFinSent": 1,
+        "eventsInclude": [
+          "ready",
+          "stream sent 0 on server-bidi-0-reply",
+          "stream received 0 on server-bidi-0",
+          "closed"
+        ],
+        "server": {
+          "streamTestBytesReceived": 0,
+          "streamTestBytesSent": 0,
+          "streamTestFinReceived": 1
+        }
+      },
+      "template": "stream-transfer"
+    },
+    {
+      "id": "reset.browser-abort-bidi",
+      "title": "Browser aborts an outgoing bidirectional WebTransport stream",
+      "wtUrl": "https://127.0.0.1:{port}/wt/reset/browser-abort-bidi?stream_size=1&stream_count=1",
+      "streamMode": "browser-abort-bidi",
+      "streamSize": 1,
+      "coverage": [
+        "constructor",
+        "ready",
+        "closed",
+        "reset-browser-abort",
+        "reset-browser-abort-bidi",
+        "reset-stream-error-code-123",
+        "reset-dedicated-endpoint"
+      ],
+      "expect": {
+        "streamMode": "browser-abort-bidi",
+        "streamSize": 1,
+        "streamBytesSent": 1,
+        "streamBytesReceived": 0,
+        "eventsInclude": [
+          "ready",
+          "stream wrote abort-bidi",
+          "stream aborted bidi",
+          "closed"
+        ],
+        "server": {
+          "resetStreamReceivedMin": 1,
+          "resetStreamAppError123Min": 1,
+          "stopSendingReceived": 0,
+          "stopSendingAppError123": 0
+        }
+      },
+      "template": "reset-stream"
+    },
+    {
+      "id": "reset.browser-abort-uni",
+      "title": "Browser aborts an outgoing unidirectional WebTransport stream",
+      "wtUrl": "https://127.0.0.1:{port}/wt/reset/browser-abort-uni?stream_size=1&stream_count=1",
+      "streamMode": "browser-abort-uni",
+      "streamSize": 1,
+      "coverage": [
+        "constructor",
+        "ready",
+        "closed",
+        "reset-browser-abort",
+        "reset-browser-abort-uni",
+        "reset-stream-error-code-123",
+        "reset-dedicated-endpoint"
+      ],
+      "expect": {
+        "streamMode": "browser-abort-uni",
+        "streamSize": 1,
+        "streamBytesSent": 1,
+        "streamBytesReceived": 0,
+        "eventsInclude": [
+          "ready",
+          "stream wrote abort-uni",
+          "stream aborted uni",
+          "closed"
+        ],
+        "server": {
+          "resetStreamReceivedMin": 1,
+          "resetStreamAppError123Min": 1,
+          "stopSendingReceived": 0,
+          "stopSendingAppError123": 0
+        }
+      },
+      "template": "reset-stream"
+    },
+    {
+      "id": "reset.browser-cancel-incoming-bidi",
+      "title": "Browser cancels an incoming bidirectional WebTransport stream",
+      "wtUrl": "https://127.0.0.1:{port}/wt/reset/browser-cancel-incoming-bidi?stream_size=1048576&stream_count=1",
+      "streamMode": "browser-cancel-incoming-bidi",
+      "streamSize": 1048576,
+      "coverage": [
+        "constructor",
+        "ready",
+        "stop-browser-cancel",
+        "stop-browser-cancel-bidi",
+        "stop-sending-error-code-123",
+        "reset-dedicated-endpoint"
+      ],
+      "expect": {
+        "streamMode": "browser-cancel-incoming-bidi",
+        "streamSize": 1048576,
+        "streamBytesSent": 0,
+        "streamBytesReceivedMin": 1,
+        "eventsInclude": [
+          "ready",
+          "stream read before cancel bidi",
+          "stream canceled incoming bidi"
+        ],
+        "server": {
+          "resetStreamReceived": 0,
+          "resetStreamAppError123": 0,
+          "stopSendingReceivedMin": 1,
+          "stopSendingAppError123Min": 1
+        }
+      },
+      "template": "reset-stream"
+    },
+    {
+      "id": "reset.browser-cancel-incoming-uni",
+      "title": "Browser cancels an incoming unidirectional WebTransport stream",
+      "wtUrl": "https://127.0.0.1:{port}/wt/reset/browser-cancel-incoming-uni?stream_size=1048576&stream_count=1",
+      "streamMode": "browser-cancel-incoming-uni",
+      "streamSize": 1048576,
+      "coverage": [
+        "constructor",
+        "ready",
+        "stop-browser-cancel",
+        "stop-browser-cancel-uni",
+        "stop-sending-error-code-123",
+        "reset-dedicated-endpoint"
+      ],
+      "expect": {
+        "streamMode": "browser-cancel-incoming-uni",
+        "streamSize": 1048576,
+        "streamBytesSent": 0,
+        "streamBytesReceivedMin": 1,
+        "eventsInclude": [
+          "ready",
+          "stream read before cancel uni",
+          "stream canceled incoming uni"
+        ],
+        "server": {
+          "resetStreamReceived": 0,
+          "resetStreamAppError123": 0,
+          "stopSendingReceivedMin": 1,
+          "stopSendingAppError123Min": 1
+        }
+      },
+      "template": "reset-stream"
+    },
+    {
+      "id": "reset.server-reset-bidi",
+      "title": "Server resets an outgoing bidirectional WebTransport stream",
+      "wtUrl": "https://127.0.0.1:{port}/wt/reset/server-reset-bidi?code=123&stream_count=1",
+      "streamMode": "server-reset-bidi",
+      "streamSize": 0,
+      "coverage": [
+        "constructor",
+        "ready",
+        "closed",
+        "reset-server-reset",
+        "reset-server-reset-bidi",
+        "reset-stream-error-code-123",
+        "reset-dedicated-endpoint"
+      ],
+      "expect": {
+        "streamMode": "server-reset-bidi",
+        "streamSize": 0,
+        "streamBytesSent": 0,
+        "streamBytesReceived": 0,
+        "eventsInclude": [
+          "ready",
+          "server reset wait server-reset-bidi",
+          "closed"
+        ],
+        "server": {
+          "resetStreamReceived": null,
+          "resetStreamAppError123": null,
+          "stopSendingReceived": null,
+          "stopSendingAppError123": null,
+          "resetStreamSentMin": 1,
+          "resetStreamSentAppError123Min": 1,
+          "stopSendingSent": 0,
+          "stopSendingSentAppError123": 0
+        }
+      },
+      "template": "reset-stream"
+    },
+    {
+      "id": "reset.server-reset-uni",
+      "title": "Server resets an outgoing unidirectional WebTransport stream",
+      "wtUrl": "https://127.0.0.1:{port}/wt/reset/server-reset-uni?code=123&stream_count=1",
+      "streamMode": "server-reset-uni",
+      "streamSize": 0,
+      "coverage": [
+        "constructor",
+        "ready",
+        "closed",
+        "reset-server-reset",
+        "reset-server-reset-uni",
+        "reset-stream-error-code-123",
+        "reset-dedicated-endpoint"
+      ],
+      "expect": {
+        "streamMode": "server-reset-uni",
+        "streamSize": 0,
+        "streamBytesSent": 0,
+        "streamBytesReceived": 0,
+        "eventsInclude": [
+          "ready",
+          "server reset wait server-reset-uni",
+          "closed"
+        ],
+        "server": {
+          "resetStreamReceived": null,
+          "resetStreamAppError123": null,
+          "stopSendingReceived": null,
+          "stopSendingAppError123": null,
+          "resetStreamSentMin": 1,
+          "resetStreamSentAppError123Min": 1,
+          "stopSendingSent": 0,
+          "stopSendingSentAppError123": 0
+        }
+      },
+      "template": "reset-stream"
+    },
+    {
+      "id": "reset.server-stop-bidi",
+      "title": "Server sends STOP_SENDING for a browser bidirectional WebTransport stream",
+      "wtUrl": "https://127.0.0.1:{port}/wt/reset/server-stop-bidi?code=123&stream_count=1",
+      "streamMode": "server-stop-bidi",
+      "streamSize": 0,
+      "coverage": [
+        "constructor",
+        "ready",
+        "closed",
+        "stop-server-stop",
+        "stop-server-stop-bidi",
+        "stop-sending-error-code-123",
+        "reset-dedicated-endpoint"
+      ],
+      "expect": {
+        "streamMode": "server-stop-bidi",
+        "streamSize": 0,
+        "streamBytesSent": 1,
+        "streamBytesReceived": 0,
+        "eventsInclude": [
+          "ready",
+          "stream wrote before stop server-stop-bidi",
+          "stream stopped server-stop-bidi",
+          "closed"
+        ],
+        "server": {
+          "resetStreamReceived": null,
+          "resetStreamAppError123": null,
+          "stopSendingReceived": null,
+          "stopSendingAppError123": null,
+          "resetStreamSent": 0,
+          "resetStreamSentAppError123": 0,
+          "stopSendingSentMin": 1,
+          "stopSendingSentAppError123Min": 1
+        }
+      },
+      "template": "reset-stream"
+    },
+    {
+      "id": "reset.server-stop-uni",
+      "title": "Server sends STOP_SENDING for a browser unidirectional WebTransport stream",
+      "wtUrl": "https://127.0.0.1:{port}/wt/reset/server-stop-uni?code=123&stream_count=1",
+      "streamMode": "server-stop-uni",
+      "streamSize": 0,
+      "coverage": [
+        "constructor",
+        "ready",
+        "closed",
+        "stop-server-stop",
+        "stop-server-stop-uni",
+        "stop-sending-error-code-123",
+        "reset-dedicated-endpoint"
+      ],
+      "expect": {
+        "streamMode": "server-stop-uni",
+        "streamSize": 0,
+        "streamBytesSent": 1,
+        "streamBytesReceived": 0,
+        "eventsInclude": [
+          "ready",
+          "stream wrote before stop server-stop-uni",
+          "stream stopped server-stop-uni",
+          "closed"
+        ],
+        "server": {
+          "resetStreamReceived": null,
+          "resetStreamAppError123": null,
+          "stopSendingReceived": null,
+          "stopSendingAppError123": null,
+          "resetStreamSent": 0,
+          "resetStreamSentAppError123": 0,
+          "stopSendingSentMin": 1,
+          "stopSendingSentAppError123Min": 1
+        }
+      },
+      "template": "reset-stream"
+    },
+    {
+      "id": "close.server-immediate",
+      "title": "Server immediately closes a WebTransport session with an empty reason",
+      "wtUrl": "https://127.0.0.1:{port}/wt/close/server-immediate?code=0&reason=",
+      "streamMode": "server-close-immediate",
+      "coverage": [
+        "constructor",
+        "closed",
+        "close-server-close",
+        "close-empty-reason",
+        "close-dedicated-endpoint"
+      ],
+      "expect": {
+        "streamMode": "server-close-immediate",
+        "eventsInclude": [
+          "lifecycle trigger server-close-immediate",
+          "closed"
+        ],
+        "server": {
+          "lifecycleTriggerReceivedMin": 1,
+          "closeSessionSentMin": 1
+        }
+      },
+      "template": "close-session"
+    },
+    {
+      "id": "close.server-after-ready",
+      "title": "Server closes a WebTransport session after the browser is ready",
+      "wtUrl": "https://127.0.0.1:{port}/wt/close/server-after-ready?code=42&reason=done",
+      "streamMode": "server-close-after-ready",
+      "coverage": [
+        "constructor",
+        "ready",
+        "closed",
+        "close-server-close",
+        "close-code-42",
+        "close-reason-done",
+        "close-dedicated-endpoint"
+      ],
+      "expect": {
+        "protocol": "devious-baton-00",
+        "streamMode": "server-close-after-ready",
+        "streamBytesSent": 1,
+        "eventsInclude": [
+          "ready",
+          "lifecycle trigger server-close-after-ready",
+          "closed"
+        ],
+        "server": {
+          "lifecycleTriggerReceivedMin": 1,
+          "closeSessionSentMin": 1,
+          "closeSessionSentError42Min": 1
+        }
+      },
+      "template": "close-session"
+    },
+    {
+      "id": "close.browser-close",
+      "title": "Browser closes a WebTransport session with code and reason",
+      "wtUrl": "https://127.0.0.1:{port}/wt/close/browser-close",
+      "streamMode": "browser-close",
+      "coverage": [
+        "constructor",
+        "ready",
+        "closed",
+        "close-browser-close",
+        "close-code-42",
+        "close-reason-done",
+        "close-dedicated-endpoint"
+      ],
+      "expect": {
+        "protocol": "devious-baton-00",
+        "streamMode": "browser-close",
+        "eventsInclude": [
+          "ready",
+          "browser close called browser-close",
+          "closed"
+        ],
+        "server": {
+          "closeSessionReceivedMin": 1,
+          "closeSessionReceivedError42Min": 1
+        }
+      },
+      "template": "close-session"
+    },
+    {
+      "id": "close.browser-close-long-reason",
+      "title": "Browser closes a WebTransport session with the maximum reason length",
+      "wtUrl": "https://127.0.0.1:{port}/wt/close/browser-close-long-reason",
+      "streamMode": "browser-close-long-reason",
+      "coverage": [
+        "constructor",
+        "ready",
+        "closed",
+        "close-browser-close",
+        "close-long-reason",
+        "close-dedicated-endpoint"
+      ],
+      "expect": {
+        "protocol": "devious-baton-00",
+        "streamMode": "browser-close-long-reason",
+        "eventsInclude": [
+          "ready",
+          "browser close called browser-close-long-reason",
+          "closed"
+        ],
+        "server": {
+          "closeSessionReceivedMin": 1,
+          "closeSessionReceivedError42Min": 1
+        }
+      },
+      "template": "close-session"
+    },
+    {
+      "id": "close.server-close-long-reason",
+      "title": "Server closes a WebTransport session with the maximum reason length",
+      "wtUrl": "https://127.0.0.1:{port}/wt/close/server-close-long-reason",
+      "streamMode": "server-close-long-reason",
+      "coverage": [
+        "constructor",
+        "closed",
+        "close-server-close",
+        "close-long-reason",
+        "close-dedicated-endpoint"
+      ],
+      "expect": {
+        "streamMode": "server-close-long-reason",
+        "eventsInclude": [
+          "lifecycle trigger server-close-long-reason",
+          "closed"
+        ],
+        "server": {
+          "lifecycleTriggerReceivedMin": 1,
+          "closeSessionSentMin": 1
+        }
+      },
+      "template": "close-session"
+    },
+    {
+      "id": "close.fin-no-capsule",
+      "title": "Server closes the WebTransport control stream without a close capsule",
+      "wtUrl": "https://127.0.0.1:{port}/wt/close/fin-no-capsule",
+      "streamMode": "fin-no-capsule",
+      "coverage": [
+        "constructor",
+        "closed",
+        "close-fin-no-capsule",
+        "close-dedicated-endpoint"
+      ],
+      "expect": {
+        "streamMode": "fin-no-capsule",
+        "eventsInclude": [
+          "lifecycle trigger fin-no-capsule",
+          "closed"
+        ],
+        "server": {
+          "lifecycleTriggerReceivedMin": 1,
+          "controlFinNoCapsuleSentMin": 1
+        }
+      },
+      "template": "close-session"
+    },
+    {
+      "id": "drain.server-drain",
+      "title": "Server drains a WebTransport session and the browser closes it",
+      "wtUrl": "https://127.0.0.1:{port}/wt/drain/server-drain",
+      "streamMode": "server-drain",
+      "coverage": [
+        "constructor",
+        "ready",
+        "closed",
+        "drain-server-drain",
+        "drain-dedicated-endpoint"
+      ],
+      "expect": {
+        "protocol": "devious-baton-00",
+        "streamMode": "server-drain",
+        "eventsInclude": [
+          "ready",
+          "lifecycle trigger server-drain",
+          "draining checked server-drain",
+          "closed"
+        ],
+        "server": {
+          "closeSessionReceivedMin": 1
+        }
+      },
+      "template": "drain-session"
+    },
+    {
+      "id": "drain.server-drain-then-close",
+      "title": "Server drains and then closes a WebTransport session",
+      "wtUrl": "https://127.0.0.1:{port}/wt/drain/server-drain-then-close",
+      "streamMode": "server-drain-then-close",
+      "coverage": [
+        "constructor",
+        "closed",
+        "drain-server-drain",
+        "close-server-close",
+        "drain-dedicated-endpoint"
+      ],
+      "expect": {
+        "streamMode": "server-drain-then-close",
+        "eventsInclude": [
+          "lifecycle trigger server-drain-then-close",
+          "draining checked server-drain-then-close",
+          "closed"
+        ],
+        "server": {
+          "closeSessionSentMin": 1
+        }
+      },
+      "template": "drain-session"
+    },
+    {
+      "id": "session-gone.active-streams",
+      "title": "Server close cleans up an active browser stream",
+      "wtUrl": "https://127.0.0.1:{port}/wt/session-gone/active-streams?code=42&reason=done",
+      "requireDatagram": false,
+      "streamMode": "session-gone-active-streams",
+      "coverage": [
+        "constructor",
+        "ready",
+        "closed",
+        "session-gone-active-streams",
+        "session-gone-post-close-streams",
+        "session-gone-dedicated-endpoint"
+      ],
+      "expect": {
+        "requireDatagram": false,
+        "constructorRequireUnreliable": false,
+        "streamMode": "session-gone-active-streams",
+        "eventsInclude": [
+          "ready",
+          "lifecycle trigger session-gone-active-streams",
+          "closed",
+          "post-close streams session-gone-active-streams"
+        ],
+        "postCloseOk": true,
+        "postCloseTestsInclude": [
+          "create-bidirectional-stream",
+          "create-unidirectional-stream"
+        ]
+      },
+      "template": "session-gone"
+    },
+    {
+      "id": "session-gone.datagram-after-close",
+      "title": "Browser datagram writes fail after server session close",
+      "wtUrl": "https://127.0.0.1:{port}/wt/session-gone/datagram-after-close?code=42&reason=done",
+      "requireDatagram": true,
+      "streamMode": "session-gone-datagram-after-close",
+      "coverage": [
+        "constructor",
+        "ready",
+        "closed",
+        "session-gone-datagram-after-close",
+        "session-gone-dedicated-endpoint"
+      ],
+      "expect": {
+        "requireDatagram": true,
+        "constructorRequireUnreliable": true,
+        "streamMode": "session-gone-datagram-after-close",
+        "eventsInclude": [
+          "ready",
+          "lifecycle trigger session-gone-datagram-after-close",
+          "closed",
+          "post-close datagram session-gone-datagram-after-close"
+        ],
+        "postCloseDatagramOk": true,
+        "postCloseDatagramTestsInclude": [
+          "datagram-write-after-close"
+        ]
+      },
+      "template": "session-gone"
+    },
+    {
+      "id": "session-gone.new-stream-after-close",
+      "title": "Browser stream creation fails after server session close",
+      "wtUrl": "https://127.0.0.1:{port}/wt/session-gone/new-stream-after-close?code=42&reason=done",
+      "requireDatagram": false,
+      "streamMode": "session-gone-new-stream-after-close",
+      "coverage": [
+        "constructor",
+        "ready",
+        "closed",
+        "session-gone-new-stream-after-close",
+        "session-gone-post-close-streams",
+        "session-gone-dedicated-endpoint"
+      ],
+      "expect": {
+        "requireDatagram": false,
+        "constructorRequireUnreliable": false,
+        "streamMode": "session-gone-new-stream-after-close",
+        "eventsInclude": [
+          "ready",
+          "lifecycle trigger session-gone-new-stream-after-close",
+          "closed",
+          "post-close streams session-gone-new-stream-after-close"
+        ],
+        "postCloseOk": true,
+        "postCloseTestsInclude": [
+          "create-bidirectional-stream",
+          "create-unidirectional-stream"
+        ]
+      },
+      "template": "session-gone"
+    }
+  ]
+}
