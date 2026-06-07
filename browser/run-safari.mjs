@@ -159,23 +159,24 @@ async function newSafariSession(endpoint) {
 }
 
 async function newSafariSessionWithRetry(endpoint) {
-  const attempts = Number(process.env.PICOQUIC_WT_SAFARI_SESSION_ATTEMPTS || 2);
+  const attempts = Number(process.env.PICOQUIC_WT_SAFARI_SESSION_ATTEMPTS || 3);
   let lastError = null;
   for (let attempt = 0; attempt < attempts; attempt++) {
     try {
       return await newSafariSession(endpoint);
     } catch (error) {
       lastError = error;
-      if (!/session timed out|RWIApplication|launching a compatible local Safari/i.test(error.message) ||
+      if (!/session timed out|RWIApplication|launching a compatible local Safari|fetch failed|ECONNREFUSED|ECONNRESET|socket hang up|other side closed/i.test(error.message) ||
         attempt + 1 >= attempts) {
         break;
       }
-      /* Safari 26.4 on the macos-26 GitHub image timed out while launching
-       * Safari before any WebTransport traffic; see run 26802093974. Retry
-       * session creation once so transient WebDriver startup does not mask the
-       * picoquic WebTransport smoke signal.
+      /* Safari 26.4 on the macos-26 GitHub image has timed out while launching
+       * Safari before any WebTransport traffic; see run 26802093974. Run
+       * 27098517885 also observed a transient fetch failure between a healthy
+       * /status probe and POST /session. Retry session creation so WebDriver
+       * startup noise does not mask the picoquic WebTransport smoke signal.
        */
-      await sleep(1500);
+      await sleep(1500 * (attempt + 1));
     }
   }
   throw lastError;
