@@ -1,10 +1,11 @@
 # WebTransport Browser E2E
 
-This directory contains manifest-driven browser E2E scenarios for picoquic's
-WebTransport-over-HTTP/3 server surface. The runner currently wraps the existing
-`pico_baton` browser harness; later scenarios should add server-side traces,
-more endpoint classes, expected-failure manifests, WPT integration, and
-additional browser adapters.
+This directory contains manifest-driven browser E2E scenarios for
+WebTransport-over-HTTP/3 server surfaces. The runner currently wraps a
+baton-style browser harness supplied by the implementation under test; later
+scenarios should add server-side traces, more endpoint classes,
+expected-failure manifests, WPT integration, and additional implementation
+adapters.
 
 List the core scenarios:
 
@@ -43,10 +44,10 @@ Positive baton scenarios may also require browser-side constructor subtests with
 and `PICOQUIC_WT_OPTIONS_CONSTRUCTOR_REQUIRED=1` only for browser/version lanes
 where that API requirement is known to be implemented. Chrome `148.0.7778.181`
 on macOS was observed to construct instead of throwing for that case, so the
-portable core manifest records the diagnostic but does not gate picoquic server
-interop on it yet.
+portable core manifest records the diagnostic but does not gate server interop
+on it yet.
 Set `requireDatagram: false` on positive scenarios that should prove
-`requireUnreliable` is only a constructor requirement knob; when picoquic
+`requireUnreliable` is only a constructor requirement knob; when the server
 advertises datagram support, those scenarios may still assert exact datagram
 send/receive payloads.
 Use `datagramWritableOk` on positive scenarios that must prove
@@ -78,7 +79,7 @@ Use `closeSessionOk` and `closeSessionTestsInclude` to require the dedicated
 browser close diagnostic. That diagnostic opens a fresh WebTransport session,
 calls `transport.close({ closeCode: 42, reason: "browser-close-test" })`, and
 requires `transport.closed` to resolve. Pair it with
-`server.browserCloseReceived` when a browser lane must prove that pico_baton
+`server.browserCloseReceived` when a browser lane must prove that the server
 observed the corresponding `WT_CLOSE_SESSION` capsule and close reason.
 Use `protocolConstructorTestsInclude`, `urlConstructorTestsInclude`, and
 `optionsConstructorTestsInclude` the same way for constructor diagnostics.
@@ -89,7 +90,7 @@ never reached `ready`, clean `closed`, or app-data send states. Failed
 handshake scenarios should also assert zero `readyMs`/`closedMs`, an empty
 selected protocol, empty payload arrays, and `datagramsSent: 0`.
 Origin-policy scenarios assert the browser-visible `ready` outcome and the
-server-side `originMissing`/`originRejected` counters parsed from `pico_baton`
+server-side `originMissing`/`originRejected` counters parsed from server
 logs, so allow and deny routes are not inferred from client results alone.
 Use `streamWritableOk` the same way for outgoing unidirectional and
 bidirectional stream writers.
@@ -101,7 +102,7 @@ override these server expectations only with browser/version evidence.
 The separate browser-close diagnostic asserts `server.browserCloseReceived`
 when the browser/version lane is expected to deliver `browser-close-test`.
 Use `server.batonDatagramsReceivedMin` and `server.zeroBatonReceivedMin` to
-prove pico_baton observed browser-to-server datagram and terminal stream-baton
+prove the server observed browser-to-server datagram and terminal stream-baton
 traffic, respectively; browser-side `sent`/`datagramsSent` values alone only
 prove the JavaScript API accepted those writes.
 Use `server.sizedDatagramsReceivedMin` and `server.datagramBytesReceivedMin`
@@ -111,14 +112,13 @@ specific payload length.
 Run the portable core scenario in Chrome:
 
 ```sh
-cmake -S native/pico_baton -B build/pico_baton \
-  -DPICOQUIC_ROOT=/path/to/picoquic \
+cmake -S /path/to/picoquic -B /path/to/picoquic/build \
   -DPICOQUIC_FETCH_PTLS:BOOL=ON
-cmake --build build/pico_baton -j$(sysctl -n hw.ncpu) --target pico_baton
+cmake --build /path/to/picoquic/build -j$(sysctl -n hw.ncpu) --target pico_baton
 CHROME_BIN="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
-PICO_BATON_BIN="$PWD/build/pico_baton/pico_baton" \
+WT_CONFORMANCE_SERVER_BIN="/path/to/picoquic/build/pico_baton" \
 PICOQUIC_WT_CHROME_HEADLESS=old \
-npx -y node@22 e2e/runners/run-browser.mjs --browser chrome --picoquic-root /path/to/picoquic
+npx -y node@22 e2e/runners/run-browser.mjs --browser chrome --implementation-root /path/to/picoquic
 ```
 
 On Apple Silicon with an x64/Rosetta Node process, add
@@ -129,7 +129,7 @@ browser lane and pointing `CHROME_BIN` at Microsoft Edge:
 ```sh
 CHROME_BIN="/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge" \
 PICOQUIC_WT_CHROME_HEADLESS=old \
-npx -y node@22 e2e/runners/run-browser.mjs --browser edge --picoquic-root /path/to/picoquic
+npx -y node@22 e2e/runners/run-browser.mjs --browser edge --implementation-root /path/to/picoquic
 ```
 
 Run Firefox stable through geckodriver:
@@ -137,7 +137,7 @@ Run Firefox stable through geckodriver:
 ```sh
 GECKO_DRIVER_BIN=/path/to/geckodriver \
 FIREFOX_BIN=/path/to/firefox \
-npx -y node@22 e2e/runners/run-browser.mjs --browser firefox --picoquic-root /path/to/picoquic
+npx -y node@22 e2e/runners/run-browser.mjs --browser firefox --implementation-root /path/to/picoquic
 ```
 
 Expected-result files live under `e2e/expected/`. They are
@@ -160,7 +160,7 @@ Safari execution requires Safari WebDriver remote automation:
 
 ```sh
 sudo safaridriver --enable
-node e2e/runners/run-browser.mjs --browser safari --picoquic-root /path/to/picoquic
+node e2e/runners/run-browser.mjs --browser safari --implementation-root /path/to/picoquic
 ```
 
 Do not use these initial E2E scenarios as a full browser-support claim. A

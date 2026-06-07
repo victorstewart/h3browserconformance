@@ -432,7 +432,7 @@ export async function waitForWebDriverHarness(endpoint, sessionId) {
   const deadline = Date.now() + 10000;
   while (Date.now() < deadline) {
     const isReady = await executeScript(endpoint, sessionId,
-      "return Boolean(window.__picoquicWebTransportResult);");
+      "return Boolean(window.__h3BrowserConformanceResult);");
     if (isReady) {
       return;
     }
@@ -454,7 +454,7 @@ export async function readWebDriverHarnessResult(endpoint, sessionId, timeoutMs)
       return String(error);
     }
     Promise.race([
-      window.__picoquicWebTransportResult,
+      window.__h3BrowserConformanceResult,
       new Promise((_, reject) => setTimeout(() =>
         reject(new Error("timeout after ${timeoutMs} ms")), ${timeoutMs}))
     ]).then(
@@ -482,7 +482,7 @@ export async function readWebDriverDiagnostic(
       return String(error);
     }
     Promise.resolve(
-      window.picoquicWebTransportBaton[functionName](options)
+      window.h3BrowserConformanceBaton[functionName](options)
     ).then(
       (value) => done({ ok: true, value }),
       (error) => done({ ok: false, error: errorText(error) })

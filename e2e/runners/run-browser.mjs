@@ -7,9 +7,11 @@ import { join, resolve } from "node:path";
 const SUITE_ROOT = resolve(new URL("../..", import.meta.url).pathname);
 const DEFAULT_MANIFEST = join(SUITE_ROOT, "e2e", "manifests", "core.json");
 const DEFAULT_EXPECTED_DIR = join(SUITE_ROOT, "e2e", "expected");
-const DEFAULT_PORT = Number(process.env.PICOQUIC_WT_PORT || 4433);
+const DEFAULT_PORT = Number(process.env.WT_CONFORMANCE_PORT ||
+  process.env.PICOQUIC_WT_PORT || 4433);
 const CHILD_TIMEOUT_OVERRIDE_MS =
-  Number(process.env.PICOQUIC_WT_E2E_CHILD_TIMEOUT_MS || 0);
+  Number(process.env.WT_CONFORMANCE_E2E_CHILD_TIMEOUT_MS ||
+    process.env.PICOQUIC_WT_E2E_CHILD_TIMEOUT_MS || 0);
 const WRONG_CERT_HASH = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 const BROWSER_RUNNERS = {
   chrome: join(SUITE_ROOT, "browser", "run-chrome.mjs"),
@@ -447,10 +449,10 @@ function validateScenario(scenario, path) {
 function usage() {
   console.error([
     "usage:",
-    "  node e2e/runners/run-browser.mjs list [--manifest <path>] [--expected <path>] [--picoquic-root <path>] [--json]",
-    "  node e2e/runners/run-browser.mjs support [--manifest <path>] [--expected-dir <path>] [--picoquic-root <path>] [--json]",
-    "  node e2e/runners/run-browser.mjs coverage [--manifest <path>] [--expected-dir <path>] [--picoquic-root <path>] [--json]",
-    "  node e2e/runners/run-browser.mjs --browser <chrome|edge|firefox|safari> [--manifest <path>] [--expected <path>] [--no-expected] [--scenario <id>] [--picoquic-root <path>] [--json]"
+    "  node e2e/runners/run-browser.mjs list [--manifest <path>] [--expected <path>] [--implementation-root <path>] [--json]",
+    "  node e2e/runners/run-browser.mjs support [--manifest <path>] [--expected-dir <path>] [--implementation-root <path>] [--json]",
+    "  node e2e/runners/run-browser.mjs coverage [--manifest <path>] [--expected-dir <path>] [--implementation-root <path>] [--json]",
+    "  node e2e/runners/run-browser.mjs --browser <chrome|edge|firefox|safari> [--manifest <path>] [--expected <path>] [--no-expected] [--scenario <id>] [--implementation-root <path>] [--json]"
   ].join("\n"));
 }
 
@@ -465,6 +467,29 @@ function takeOption(args, name, fallback = "") {
   const value = args[index + 1];
   args.splice(index, 2);
   return value;
+}
+
+function takeFirstOption(args, names, fallback = "") {
+  for (const name of names) {
+    const index = args.indexOf(name);
+    if (index >= 0) {
+      if (index + 1 >= args.length) {
+        throw new Error(`missing value for ${name}`);
+      }
+      const value = args[index + 1];
+      args.splice(index, 2);
+      return value;
+    }
+  }
+  return fallback;
+}
+
+function takeImplementationRoot(args, fallback = process.cwd()) {
+  return resolve(takeFirstOption(args, ["--implementation-root", "--picoquic-root"],
+    process.env.WT_CONFORMANCE_IMPLEMENTATION_ROOT ||
+    process.env.PICOQUIC_REPO_ROOT ||
+    process.env.PICOQUIC_ROOT ||
+    fallback));
 }
 
 function hasOption(args, name) {
@@ -1119,10 +1144,19 @@ async function runScenario(browser, scenario, vars) {
   const scenarioExpect = mergeExpect(rendered.expect || {}, expectedOverride);
   const env = {
     ...process.env,
-    PICOQUIC_REPO_ROOT: vars.picoquicRoot,
-    PICO_BATON_BIN: process.env.PICO_BATON_BIN ||
-      join(vars.picoquicRoot, "build", "pico_baton"),
-    PICOQUIC_WT_WEB_ROOT: process.env.PICOQUIC_WT_WEB_ROOT ||
+    WT_CONFORMANCE_IMPLEMENTATION_ROOT: vars.implementationRoot,
+    PICOQUIC_REPO_ROOT: vars.implementationRoot,
+    WT_CONFORMANCE_SERVER_BIN: process.env.WT_CONFORMANCE_SERVER_BIN ||
+      process.env.PICO_BATON_BIN ||
+      join(vars.implementationRoot, "build", "pico_baton"),
+    PICO_BATON_BIN: process.env.WT_CONFORMANCE_SERVER_BIN ||
+      process.env.PICO_BATON_BIN ||
+      join(vars.implementationRoot, "build", "pico_baton"),
+    WT_CONFORMANCE_WEB_ROOT: process.env.WT_CONFORMANCE_WEB_ROOT ||
+      process.env.PICOQUIC_WT_WEB_ROOT ||
+      join(SUITE_ROOT, "browser"),
+    PICOQUIC_WT_WEB_ROOT: process.env.WT_CONFORMANCE_WEB_ROOT ||
+      process.env.PICOQUIC_WT_WEB_ROOT ||
       join(SUITE_ROOT, "browser"),
     PICOQUIC_WT_URL: rendered.wtUrl,
     PICOQUIC_WT_PROTOCOL: rendered.protocol || "devious-baton-00",
@@ -1138,6 +1172,7 @@ async function runScenario(browser, scenario, vars) {
     PICOQUIC_WT_PROTOCOL_CONSTRUCTOR: scenarioExpect.ok === false ? "0" : "1",
     PICOQUIC_WT_INCLUDE_SERVER_SUMMARY: "1",
     PICOQUIC_WT_TIMEOUT_MS: String(rendered.timeoutMs || 30000),
+    WT_CONFORMANCE_PORT: String(vars.port),
     PICOQUIC_WT_PORT: String(vars.port)
   };
   if (rendered.certificateHashAlgorithm) {
@@ -1202,7 +1237,7 @@ async function runScenario(browser, scenario, vars) {
 }
 
 function commandList(args) {
-  takeOption(args, "--picoquic-root", process.env.PICOQUIC_REPO_ROOT || "");
+  takeImplementationRoot(args);
   const manifestPath = resolve(takeOption(args, "--manifest", DEFAULT_MANIFEST));
   const expectedPath = takeOption(args, "--expected", "");
   const json = hasOption(args, "--json");
@@ -1285,7 +1320,7 @@ function loadSupport(manifestPath, expectedDir) {
 }
 
 function commandSupport(args) {
-  takeOption(args, "--picoquic-root", process.env.PICOQUIC_REPO_ROOT || "");
+  takeImplementationRoot(args);
   const manifestPath = resolve(takeOption(args, "--manifest", DEFAULT_MANIFEST));
   const expectedDir = resolve(takeOption(args, "--expected-dir",
     DEFAULT_EXPECTED_DIR));
@@ -1319,7 +1354,7 @@ function addCoverageStatus(coverageEntry, browser, status) {
 }
 
 function commandCoverage(args) {
-  takeOption(args, "--picoquic-root", process.env.PICOQUIC_REPO_ROOT || "");
+  takeImplementationRoot(args);
   const manifestPath = resolve(takeOption(args, "--manifest", DEFAULT_MANIFEST));
   const expectedDir = resolve(takeOption(args, "--expected-dir",
     DEFAULT_EXPECTED_DIR));
@@ -1378,9 +1413,11 @@ function commandCoverage(args) {
 }
 
 async function commandRun(args) {
-  const picoquicRoot = resolve(takeOption(args, "--picoquic-root",
-    process.env.PICOQUIC_REPO_ROOT || process.cwd()));
-  const browser = takeOption(args, "--browser", process.env.PICOQUIC_WT_BROWSER || "");
+  const implementationRoot = takeImplementationRoot(args);
+  const browser = takeOption(args, "--browser",
+    process.env.WT_CONFORMANCE_BROWSER ||
+    process.env.PICOQUIC_WT_BROWSER ||
+    "");
   const manifestPath = resolve(takeOption(args, "--manifest", DEFAULT_MANIFEST));
   const scenarioId = takeOption(args, "--scenario", "");
   const noExpected = hasOption(args, "--no-expected");
@@ -1397,7 +1434,7 @@ async function commandRun(args) {
   const manifest = loadManifest(manifestPath);
   const expected = loadExpected(expectedPath, manifest);
   requireExpectedBrowser(expected, browser);
-  const vars = { port: DEFAULT_PORT, expected, picoquicRoot };
+  const vars = { port: DEFAULT_PORT, expected, implementationRoot };
   const scenarios = selectedScenarios(manifest, scenarioId);
   const results = [];
   for (const scenario of scenarios) {

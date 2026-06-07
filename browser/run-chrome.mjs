@@ -30,10 +30,19 @@ import {
 } from "./runner-common.mjs";
 
 const SUITE_ROOT = resolve(new URL("..", import.meta.url).pathname);
-const PICOQUIC_ROOT = resolve(process.env.PICOQUIC_REPO_ROOT || process.env.PICOQUIC_ROOT || process.cwd());
-const BATON = process.env.PICO_BATON_BIN || join(PICOQUIC_ROOT, "build", "pico_baton");
-const WEB_ROOT = process.env.PICOQUIC_WT_WEB_ROOT || join(SUITE_ROOT, "browser");
-const PORT = Number(process.env.PICOQUIC_WT_PORT || 4433);
+const IMPLEMENTATION_ROOT = resolve(
+  process.env.WT_CONFORMANCE_IMPLEMENTATION_ROOT ||
+  process.env.PICOQUIC_REPO_ROOT ||
+  process.env.PICOQUIC_ROOT ||
+  process.cwd());
+const BATON = process.env.WT_CONFORMANCE_SERVER_BIN ||
+  process.env.PICO_BATON_BIN ||
+  join(IMPLEMENTATION_ROOT, "build", "pico_baton");
+const WEB_ROOT = process.env.WT_CONFORMANCE_WEB_ROOT ||
+  process.env.PICOQUIC_WT_WEB_ROOT ||
+  join(SUITE_ROOT, "browser");
+const PORT = Number(process.env.WT_CONFORMANCE_PORT ||
+  process.env.PICOQUIC_WT_PORT || 4433);
 const PROTOCOL = process.env.PICOQUIC_WT_PROTOCOL || "devious-baton-00";
 const REQUIRE_PROTOCOL = process.env.PICOQUIC_WT_REQUIRE_PROTOCOL !== "0";
 const REQUIRE_DATAGRAM = process.env.PICOQUIC_WT_REQUIRE_DATAGRAM !== "0";
@@ -197,7 +206,7 @@ async function waitForHarness(cdp) {
   const deadline = Date.now() + 10000;
   while (Date.now() < deadline) {
     const probe = await cdp.send("Runtime.evaluate", {
-      expression: "Boolean(window.__picoquicWebTransportResult)",
+      expression: "Boolean(window.__h3BrowserConformanceResult)",
       returnByValue: true
     });
     if (probe.result && probe.result.value) {
@@ -215,7 +224,7 @@ async function waitForHarness(cdp) {
 async function readHarnessResult(cdp) {
   const expression =
     "Promise.race([" +
-    "window.__picoquicWebTransportResult," +
+    "window.__h3BrowserConformanceResult," +
     `new Promise((_, reject) => setTimeout(() => reject(new Error('timeout after ${TIMEOUT_MS} ms')), ${TIMEOUT_MS}))` +
     "])";
   const result = await cdp.send("Runtime.evaluate", {
@@ -239,7 +248,7 @@ async function readProtocolConstructorResult(cdp, certificateHash) {
     protocol: PROTOCOL
   });
   const result = await cdp.send("Runtime.evaluate", {
-    expression: `window.picoquicWebTransportBaton.runProtocolConstructorTests(${options})`,
+    expression: `window.h3BrowserConformanceBaton.runProtocolConstructorTests(${options})`,
     awaitPromise: true,
     returnByValue: true
   });
@@ -260,7 +269,7 @@ async function readUrlConstructorResult(cdp, certificateHash) {
     protocol: PROTOCOL
   });
   const result = await cdp.send("Runtime.evaluate", {
-    expression: `window.picoquicWebTransportBaton.runUrlConstructorTests(${options})`,
+    expression: `window.h3BrowserConformanceBaton.runUrlConstructorTests(${options})`,
     awaitPromise: true,
     returnByValue: true
   });
@@ -281,7 +290,7 @@ async function readOptionsConstructorResult(cdp, certificateHash) {
     protocol: PROTOCOL
   });
   const result = await cdp.send("Runtime.evaluate", {
-    expression: `window.picoquicWebTransportBaton.runOptionsConstructorTests(${options})`,
+    expression: `window.h3BrowserConformanceBaton.runOptionsConstructorTests(${options})`,
     awaitPromise: true,
     returnByValue: true
   });
@@ -303,7 +312,7 @@ async function readWritableBadChunkResult(cdp, certificateHash) {
     requireDatagram: REQUIRE_DATAGRAM
   });
   const result = await cdp.send("Runtime.evaluate", {
-    expression: `window.picoquicWebTransportBaton.runWritableBadChunkTests(${options})`,
+    expression: `window.h3BrowserConformanceBaton.runWritableBadChunkTests(${options})`,
     awaitPromise: true,
     returnByValue: true
   });
@@ -325,7 +334,7 @@ async function readCloseSessionResult(cdp, certificateHash) {
     requireDatagram: REQUIRE_DATAGRAM
   });
   const result = await cdp.send("Runtime.evaluate", {
-    expression: `window.picoquicWebTransportBaton.runCloseSessionTests(${options})`,
+    expression: `window.h3BrowserConformanceBaton.runCloseSessionTests(${options})`,
     awaitPromise: true,
     returnByValue: true
   });
@@ -347,8 +356,8 @@ async function main() {
     throw new Error("No Chrome/Chromium binary found. Set CHROME_BIN to run this test.");
   }
 
-  const profile = mkdtempSync(join(tmpdir(), "picoquic-wt-chrome-"));
-  const certConfig = await getCertificateConfig(PICOQUIC_ROOT, profile);
+  const profile = mkdtempSync(join(tmpdir(), "h3-wt-chrome-"));
+  const certConfig = await getCertificateConfig(IMPLEMENTATION_ROOT, profile);
   const targetUrl = buildBatonPageUrl(PAGE_URL, {
     timeoutMs: TIMEOUT_MS,
     wtUrl: WT_URL,
@@ -379,7 +388,10 @@ async function main() {
     const logTarget = serverLog === "1" ? "-" : serverLog;
     serverArgs.splice(serverArgs.length - 1, 0, "-l", logTarget, "-L");
   }
-  const server = spawn(BATON, serverArgs, { cwd: PICOQUIC_ROOT, stdio: ["ignore", "pipe", "pipe"] });
+  const server = spawn(BATON, serverArgs, {
+    cwd: IMPLEMENTATION_ROOT,
+    stdio: ["ignore", "pipe", "pipe"]
+  });
   const serverOutput = makeServerOutputRecorder({
     outputLimit: SERVER_OUTPUT_LIMIT,
     summaryTraceLimit: SERVER_SUMMARY_TRACE_LIMIT,

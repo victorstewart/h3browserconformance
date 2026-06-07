@@ -7,9 +7,14 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
 const SUITE_ROOT = resolve(new URL("..", import.meta.url).pathname);
-const PICOQUIC_ROOT = resolve(process.env.PICOQUIC_REPO_ROOT || process.env.PICOQUIC_ROOT || process.cwd());
+const IMPLEMENTATION_ROOT = resolve(
+  process.env.WT_CONFORMANCE_IMPLEMENTATION_ROOT ||
+  process.env.PICOQUIC_REPO_ROOT ||
+  process.env.PICOQUIC_ROOT ||
+  process.cwd());
 const DEFAULT_WEB_ROOT = join(SUITE_ROOT, "browser");
-const DEFAULT_PORT = 4433;
+const DEFAULT_PORT = Number(process.env.WT_CONFORMANCE_PORT ||
+  process.env.PICOQUIC_WT_PORT || 4433);
 const DEFAULT_PATH = "/baton";
 
 const EXPECTED_WPT_TESTS = [
@@ -36,9 +41,9 @@ const EXPECTED_ENTRY_FIELDS = new Set(["test", "status", "reason"]);
 function usage() {
   console.error([
     "usage:",
-    "  node wpt/run-wpt.mjs list [--wpt-root <path>] [--expected <path>] [--picoquic-root <path>] [--json]",
-    "  node wpt/run-wpt.mjs run --wpt-root <path> --browser <name> [--test <path-or-pattern>] [--expected <path>] [--picoquic-root <path>] [--dry-run] [--wpt-arg <arg>...]",
-    "  node wpt/run-wpt.mjs server-smoke [--baton-bin <path>|--baton <path>] [--port <n>] [--web-root <path>] [--picoquic-root <path>]"
+    "  node wpt/run-wpt.mjs list [--wpt-root <path>] [--expected <path>] [--implementation-root <path>] [--json]",
+    "  node wpt/run-wpt.mjs run --wpt-root <path> --browser <name> [--test <path-or-pattern>] [--expected <path>] [--implementation-root <path>] [--dry-run] [--wpt-arg <arg>...]",
+    "  node wpt/run-wpt.mjs server-smoke [--server-bin <path>] [--port <n>] [--web-root <path>] [--implementation-root <path>]"
   ].join("\n"));
 }
 
@@ -93,6 +98,10 @@ function takeOptions(args, name) {
     args.splice(index, 2);
   }
   return values;
+}
+
+function takeImplementationRoot(args, fallback = IMPLEMENTATION_ROOT) {
+  return resolve(takeFirstOption(args, ["--implementation-root", "--picoquic-root"], fallback));
 }
 
 function runChecked(command, args) {
@@ -337,8 +346,9 @@ function requireExpectedBrowser(expected, browser, expectedPath) {
 }
 
 async function commandList(args) {
-  takeOption(args, "--picoquic-root", process.env.PICOQUIC_REPO_ROOT || "");
-  const wptRoot = takeOption(args, "--wpt-root", process.env.PICOQUIC_WPT_ROOT || "");
+  takeImplementationRoot(args);
+  const wptRoot = takeOption(args, "--wpt-root",
+    process.env.WT_CONFORMANCE_WPT_ROOT || process.env.PICOQUIC_WPT_ROOT || "");
   const expectedPath = takeOption(args, "--expected", "");
   const json = hasOption(args, "--json");
   if (args.length !== 0) {
@@ -364,31 +374,38 @@ async function commandList(args) {
 }
 
 async function commandServerSmoke(args) {
-  const picoquicRoot = resolve(takeOption(args, "--picoquic-root",
-    process.env.PICOQUIC_REPO_ROOT || PICOQUIC_ROOT));
-  const baton = resolve(takeFirstOption(args, ["--baton-bin", "--baton"],
-    process.env.PICO_BATON_BIN || join(picoquicRoot, "build", "pico_baton")));
-  const webRoot = resolve(takeOption(args, "--web-root", process.env.PICOQUIC_WT_WEB_ROOT || DEFAULT_WEB_ROOT));
-  const port = Number(takeOption(args, "--port", process.env.PICOQUIC_WT_PORT || String(DEFAULT_PORT)));
+  const implementationRoot = takeImplementationRoot(args);
+  const serverBin = resolve(takeFirstOption(args, ["--server-bin", "--baton-bin", "--baton"],
+    process.env.WT_CONFORMANCE_SERVER_BIN ||
+    process.env.PICO_BATON_BIN ||
+    join(implementationRoot, "build", "pico_baton")));
+  const webRoot = resolve(takeOption(args, "--web-root",
+    process.env.WT_CONFORMANCE_WEB_ROOT ||
+    process.env.PICOQUIC_WT_WEB_ROOT ||
+    DEFAULT_WEB_ROOT));
+  const port = Number(takeOption(args, "--port",
+    process.env.WT_CONFORMANCE_PORT ||
+    process.env.PICOQUIC_WT_PORT ||
+    String(DEFAULT_PORT)));
   if (args.length !== 0) {
     throw new Error(`unexpected server-smoke arguments: ${args.join(" ")}`);
   }
-  if (!existsSync(baton)) {
-    throw new Error(`pico_baton not found: ${baton}`);
+  if (!existsSync(serverBin)) {
+    throw new Error(`server binary not found: ${serverBin}`);
   }
   if (!existsSync(webRoot)) {
     throw new Error(`web root not found: ${webRoot}`);
   }
 
-  const workDir = mkdtempSync(join(tmpdir(), "picoquic-wpt-"));
+  const workDir = mkdtempSync(join(tmpdir(), "wt-conformance-wpt-"));
   const cert = await makeCertificate(workDir);
-  const server = spawn(baton, [
+  const server = spawn(serverBin, [
     "-p", String(port),
     "-c", cert.cert,
     "-k", cert.key,
     "-w", webRoot,
     DEFAULT_PATH
-  ], { cwd: picoquicRoot, stdio: ["ignore", "pipe", "pipe"] });
+  ], { cwd: implementationRoot, stdio: ["ignore", "pipe", "pipe"] });
 
   try {
     await waitForServer(server);
@@ -405,9 +422,11 @@ async function commandServerSmoke(args) {
 }
 
 async function commandRun(args) {
-  takeOption(args, "--picoquic-root", process.env.PICOQUIC_REPO_ROOT || "");
-  const rawWptRoot = takeOption(args, "--wpt-root", process.env.PICOQUIC_WPT_ROOT || "");
-  const browser = takeOption(args, "--browser", process.env.PICOQUIC_WPT_BROWSER || "");
+  takeImplementationRoot(args);
+  const rawWptRoot = takeOption(args, "--wpt-root",
+    process.env.WT_CONFORMANCE_WPT_ROOT || process.env.PICOQUIC_WPT_ROOT || "");
+  const browser = takeOption(args, "--browser",
+    process.env.WT_CONFORMANCE_WPT_BROWSER || process.env.PICOQUIC_WPT_BROWSER || "");
   const expectedPath = takeOption(args, "--expected", "");
   const selectors = takeOptions(args, "--test");
   const wptArgs = takeOptions(args, "--wpt-arg");
@@ -416,14 +435,14 @@ async function commandRun(args) {
     throw new Error(`unexpected run arguments: ${args.join(" ")}`);
   }
   if (!rawWptRoot) {
-    throw new Error("missing WPT checkout; pass --wpt-root or set PICOQUIC_WPT_ROOT");
+    throw new Error("missing WPT checkout; pass --wpt-root or set WT_CONFORMANCE_WPT_ROOT");
   }
   const wptRoot = resolve(rawWptRoot);
   if (!existsSync(wptRoot)) {
     throw new Error(`WPT checkout not found: ${wptRoot}`);
   }
   if (!browser) {
-    throw new Error("missing browser; pass --browser or set PICOQUIC_WPT_BROWSER");
+    throw new Error("missing browser; pass --browser or set WT_CONFORMANCE_WPT_BROWSER");
   }
 
   const command = resolveWptCommand(wptRoot);

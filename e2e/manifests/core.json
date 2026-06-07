@@ -1,6 +1,6 @@
 {
   "suite": "core",
-  "description": "Portable WebTransport browser E2E scenarios backed by pico_baton.",
+  "description": "Portable WebTransport browser E2E scenarios backed by a baton-style server.",
   "templates": {
     "negative-handshake": {
       "runner": "browser-baton",

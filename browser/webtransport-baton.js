@@ -1104,14 +1104,14 @@
       postCloseDatagram: null,
       events: []
     };
-    window.__picoquicWebTransportProgress = result;
+    window.__h3BrowserConformanceProgress = result;
     var timeoutMs = options.timeoutMs || DEFAULT_TIMEOUT_MS;
     var transport = null;
     var closedPromise = null;
 
     function note(event) {
       result.events.push({ t: nowMs() - result.startedMs, event: event });
-      window.__picoquicWebTransportProgress = result;
+      window.__h3BrowserConformanceProgress = result;
       if (options.onProgress) {
         options.onProgress(result);
       }
@@ -1547,7 +1547,7 @@
       postClose: null,
       events: []
     };
-    window.__picoquicWebTransportProgress = result;
+    window.__h3BrowserConformanceProgress = result;
     var timeoutMs = options.timeoutMs || DEFAULT_TIMEOUT_MS;
     var transport = new WebTransport(options.url, buildTransportOptions(options));
     var finished = false;
@@ -1566,7 +1566,7 @@
 
     function note(event) {
       result.events.push({ t: nowMs() - result.startedMs, event: event });
-      window.__picoquicWebTransportProgress = result;
+      window.__h3BrowserConformanceProgress = result;
       if (options.onProgress) {
         options.onProgress(result);
       }
@@ -2004,7 +2004,7 @@
       setText("state", "pass");
       return result;
     } catch (error) {
-      var progress = window.__picoquicWebTransportProgress;
+      var progress = window.__h3BrowserConformanceProgress;
       var failed = {
         ok: false,
         url: options.url,
@@ -2051,15 +2051,15 @@
 
     document.getElementById("controls").addEventListener("submit", function (event) {
       event.preventDefault();
-      window.__picoquicWebTransportResult = runFromPage();
+      window.__h3BrowserConformanceResult = runFromPage();
     });
 
     if (hasAutoRun(search)) {
-      window.__picoquicWebTransportResult = runFromPage();
+      window.__h3BrowserConformanceResult = runFromPage();
     }
   }
 
-  window.picoquicWebTransportBaton = {
+  window.h3BrowserConformanceBaton = {
     defaultTarget: defaultTarget,
     makeBatonPacket: makeBatonPacket,
     runProtocolConstructorTests: runProtocolConstructorTests,

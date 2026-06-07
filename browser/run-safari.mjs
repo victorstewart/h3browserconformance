@@ -39,11 +39,19 @@ import {
 } from "./runner-common.mjs";
 
 const SUITE_ROOT = resolve(new URL("..", import.meta.url).pathname);
-const PICOQUIC_ROOT = resolve(process.env.PICOQUIC_REPO_ROOT || process.env.PICOQUIC_ROOT || process.cwd());
-const BATON = process.env.PICO_BATON_BIN || join(PICOQUIC_ROOT, "build", "pico_baton");
-const WEB_ROOT = process.env.PICOQUIC_WT_WEB_ROOT ||
+const IMPLEMENTATION_ROOT = resolve(
+  process.env.WT_CONFORMANCE_IMPLEMENTATION_ROOT ||
+  process.env.PICOQUIC_REPO_ROOT ||
+  process.env.PICOQUIC_ROOT ||
+  process.cwd());
+const BATON = process.env.WT_CONFORMANCE_SERVER_BIN ||
+  process.env.PICO_BATON_BIN ||
+  join(IMPLEMENTATION_ROOT, "build", "pico_baton");
+const WEB_ROOT = process.env.WT_CONFORMANCE_WEB_ROOT ||
+  process.env.PICOQUIC_WT_WEB_ROOT ||
   join(SUITE_ROOT, "browser");
-const PORT = Number(process.env.PICOQUIC_WT_PORT || 4433);
+const PORT = Number(process.env.WT_CONFORMANCE_PORT ||
+  process.env.PICOQUIC_WT_PORT || 4433);
 const PROTOCOL = process.env.PICOQUIC_WT_PROTOCOL || "devious-baton-00";
 const REQUIRE_PROTOCOL = process.env.PICOQUIC_WT_REQUIRE_PROTOCOL !== "0";
 const REQUIRE_DATAGRAM = process.env.PICOQUIC_WT_REQUIRE_DATAGRAM !== "0";
@@ -174,7 +182,7 @@ async function newSafariSessionWithRetry(endpoint) {
        * Safari before any WebTransport traffic; see run 26802093974. Run
        * 27098517885 also observed a transient fetch failure between a healthy
        * /status probe and POST /session. Retry session creation so WebDriver
-       * startup noise does not mask the picoquic WebTransport smoke signal.
+       * startup noise does not mask the WebTransport smoke signal.
        */
       await sleep(1500 * (attempt + 1));
     }
@@ -191,8 +199,8 @@ async function main() {
     throw new Error("No safaridriver binary found. Set SAFARI_DRIVER_BIN to run this test.");
   }
 
-  const workDir = mkdtempSync(join(tmpdir(), "picoquic-wt-safari-"));
-  const certConfig = await getCertificateConfig(PICOQUIC_ROOT, workDir);
+  const workDir = mkdtempSync(join(tmpdir(), "h3-wt-safari-"));
+  const certConfig = await getCertificateConfig(IMPLEMENTATION_ROOT, workDir);
   const harness = PAGE_URL ? null : await startHarnessServer(WEB_ROOT, HARNESS_PORT);
   const targetUrl = buildBatonPageUrl(PAGE_URL || harness.url, {
     timeoutMs: TIMEOUT_MS,
@@ -224,7 +232,10 @@ async function main() {
     const logTarget = serverLog === "1" ? "-" : serverLog;
     serverArgs.splice(serverArgs.length - 1, 0, "-l", logTarget, "-L");
   }
-  const server = spawn(BATON, serverArgs, { cwd: PICOQUIC_ROOT, stdio: ["ignore", "pipe", "pipe"] });
+  const server = spawn(BATON, serverArgs, {
+    cwd: IMPLEMENTATION_ROOT,
+    stdio: ["ignore", "pipe", "pipe"]
+  });
   const serverOutput = makeServerOutputRecorder({
     outputLimit: SERVER_OUTPUT_LIMIT,
     summaryTraceLimit: SERVER_SUMMARY_TRACE_LIMIT,

@@ -74,6 +74,5 @@ jobs:
       - name: Smoke-test pico_baton adapter
         run: |
           npx -y node@22 h3browserconformance/wpt/run-wpt.mjs server-smoke \
-            --picoquic-root "$PWD/picoquic" \
-            --baton-bin "$PWD/picoquic/build/pico_baton"
-
+            --implementation-root "$PWD/picoquic" \
+            --server-bin "$PWD/picoquic/build/pico_baton"

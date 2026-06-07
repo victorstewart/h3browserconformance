@@ -1,20 +1,19 @@
 # WebTransport Browser Harness
 
-This directory contains a static browser harness for the `pico_baton`
-WebTransport sample. It exercises the browser WebTransport constructor, session
-ready/closed promises, incoming unidirectional streams, incoming bidirectional
-streams, outgoing unidirectional streams, outgoing bidirectional streams, and
-datagrams. By default it also offers the `devious-baton-00` protocol so the
-server's `WT-Protocol` selection path is covered.
+This directory contains a static browser harness for a baton-style
+WebTransport server. It exercises the browser WebTransport constructor,
+session ready/closed promises, incoming unidirectional streams, incoming
+bidirectional streams, outgoing unidirectional streams, outgoing bidirectional
+streams, and datagrams. By default it also offers the `devious-baton-00`
+protocol so the server's `WT-Protocol` selection path is covered.
 
 ## Serve
 
 ```sh
-cmake -S native/pico_baton -B build/pico_baton \
-  -DPICOQUIC_ROOT=/path/to/picoquic \
+cmake -S /path/to/picoquic -B /path/to/picoquic/build \
   -DPICOQUIC_FETCH_PTLS:BOOL=ON
-cmake --build build/pico_baton -j$(nproc) --target pico_baton
-build/pico_baton/pico_baton -p 4433 -c /path/to/picoquic/certs/cert.pem -k /path/to/picoquic/certs/key.pem -w browser /baton
+cmake --build /path/to/picoquic/build -j$(nproc) --target pico_baton
+/path/to/picoquic/build/pico_baton -p 4433 -c /path/to/picoquic/certs/cert.pem -k /path/to/picoquic/certs/key.pem -w browser /baton
 ```
 
 Then open:
@@ -37,7 +36,7 @@ server to close the session cleanly.
 ## Certificates
 
 Browsers require WebTransport over a secure context. For local testing, trust
-the certificate used by `pico_baton`, launch the browser with a local testing
+the certificate used by the server, launch the browser with a local testing
 certificate override, or serve this page from another trusted origin and pass a
 certificate hash:
 
@@ -53,7 +52,7 @@ datagram support in the `WebTransport` constructor.
 Add `useByob=0` to the page URL, or set `PICOQUIC_WT_USE_BYOB=0` for the
 browser runners, to exercise WebTransport receive streams through default
 readers instead of BYOB readers.
-Add `padding=0` to the WebTransport endpoint URL to make `pico_baton` send
+Add `padding=0` to the WebTransport endpoint URL to make the server send
 compact baton stream packets instead of the default padded packets.
 Certificate hash authentication requires a browser-acceptable X.509v3 leaf
 certificate, normally P-256 ECDSA, with a validity period under two weeks. A
@@ -69,13 +68,13 @@ openssl x509 -in /tmp/picoquic-wt-cert/cert.pem -outform der | openssl dgst -sha
 ## Chrome
 
 Use a Chrome or Chromium build with WebTransport enabled and a certificate path
-that the browser accepts. The dependency-free runner starts `pico_baton`,
+that the browser accepts. The dependency-free runner starts the server,
 launches Chrome/Chromium through the DevTools protocol, and validates the
 result:
 
 ```sh
-PICOQUIC_REPO_ROOT=/path/to/picoquic \
-PICO_BATON_BIN=/path/to/h3browserconformance/build/pico_baton/pico_baton \
+WT_CONFORMANCE_IMPLEMENTATION_ROOT=/path/to/picoquic \
+WT_CONFORMANCE_SERVER_BIN=/path/to/picoquic/build/pico_baton \
 node browser/run-chrome.mjs
 ```
 
@@ -98,12 +97,12 @@ runner's `protocolConstructor` and `urlConstructor` checks all pass.
 
 Use a Firefox build with WebTransport support and install `geckodriver` on
 `PATH`, or set `GECKO_DRIVER_BIN=/path/to/geckodriver`. The dependency-free
-runner starts `pico_baton`, starts geckodriver, launches Firefox with WebDriver,
+runner starts the server, starts geckodriver, launches Firefox with WebDriver,
 and validates the result:
 
 ```sh
-PICOQUIC_REPO_ROOT=/path/to/picoquic \
-PICO_BATON_BIN=/path/to/h3browserconformance/build/pico_baton/pico_baton \
+WT_CONFORMANCE_IMPLEMENTATION_ROOT=/path/to/picoquic \
+WT_CONFORMANCE_SERVER_BIN=/path/to/picoquic/build/pico_baton \
 node browser/run-firefox.mjs
 ```
 
@@ -113,7 +112,7 @@ geckodriver. The runner uses headless Firefox by default; set
 
 ## Safari
 
-Run the same URL in Safari after trusting the `pico_baton` certificate:
+Run the same URL in Safari after trusting the server certificate:
 
 ```text
 https://localhost:4433/index.html?autorun=1
@@ -129,8 +128,8 @@ sudo safaridriver --enable
 or enable **Allow Remote Automation** in Safari Settings > Developer. Then run:
 
 ```sh
-PICOQUIC_REPO_ROOT=/path/to/picoquic \
-PICO_BATON_BIN=/path/to/h3browserconformance/build/pico_baton/pico_baton \
+WT_CONFORMANCE_IMPLEMENTATION_ROOT=/path/to/picoquic \
+WT_CONFORMANCE_SERVER_BIN=/path/to/picoquic/build/pico_baton \
 node browser/run-safari.mjs
 ```
 
