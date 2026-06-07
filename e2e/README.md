@@ -111,8 +111,12 @@ specific payload length.
 Run the portable core scenario in Chrome:
 
 ```sh
-cmake --build build -j$(sysctl -n hw.ncpu) --target pico_baton
+cmake -S native/pico_baton -B build/pico_baton \
+  -DPICOQUIC_ROOT=/path/to/picoquic \
+  -DPICOQUIC_FETCH_PTLS:BOOL=ON
+cmake --build build/pico_baton -j$(sysctl -n hw.ncpu) --target pico_baton
 CHROME_BIN="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
+PICO_BATON_BIN="$PWD/build/pico_baton/pico_baton" \
 PICOQUIC_WT_CHROME_HEADLESS=old \
 npx -y node@22 e2e/runners/run-browser.mjs --browser chrome --picoquic-root /path/to/picoquic
 ```

@@ -10,8 +10,11 @@ server's `WT-Protocol` selection path is covered.
 ## Serve
 
 ```sh
-cmake --build /path/to/picoquic/build -j$(nproc) --target pico_baton
-/path/to/picoquic/build/pico_baton -p 4433 -c /path/to/picoquic/certs/cert.pem -k /path/to/picoquic/certs/key.pem -w browser /baton
+cmake -S native/pico_baton -B build/pico_baton \
+  -DPICOQUIC_ROOT=/path/to/picoquic \
+  -DPICOQUIC_FETCH_PTLS:BOOL=ON
+cmake --build build/pico_baton -j$(nproc) --target pico_baton
+build/pico_baton/pico_baton -p 4433 -c /path/to/picoquic/certs/cert.pem -k /path/to/picoquic/certs/key.pem -w browser /baton
 ```
 
 Then open:
@@ -71,7 +74,9 @@ launches Chrome/Chromium through the DevTools protocol, and validates the
 result:
 
 ```sh
-PICOQUIC_REPO_ROOT=/path/to/picoquic node browser/run-chrome.mjs
+PICOQUIC_REPO_ROOT=/path/to/picoquic \
+PICO_BATON_BIN=/path/to/h3browserconformance/build/pico_baton/pico_baton \
+node browser/run-chrome.mjs
 ```
 
 Set `CHROME_BIN=/path/to/chrome` if the browser is not on `PATH`. The runner
@@ -97,7 +102,9 @@ runner starts `pico_baton`, starts geckodriver, launches Firefox with WebDriver,
 and validates the result:
 
 ```sh
-PICOQUIC_REPO_ROOT=/path/to/picoquic node browser/run-firefox.mjs
+PICOQUIC_REPO_ROOT=/path/to/picoquic \
+PICO_BATON_BIN=/path/to/h3browserconformance/build/pico_baton/pico_baton \
+node browser/run-firefox.mjs
 ```
 
 Set `FIREFOX_BIN=/path/to/firefox` if the browser is not discoverable by
@@ -122,7 +129,9 @@ sudo safaridriver --enable
 or enable **Allow Remote Automation** in Safari Settings > Developer. Then run:
 
 ```sh
-PICOQUIC_REPO_ROOT=/path/to/picoquic node browser/run-safari.mjs
+PICOQUIC_REPO_ROOT=/path/to/picoquic \
+PICO_BATON_BIN=/path/to/h3browserconformance/build/pico_baton/pico_baton \
+node browser/run-safari.mjs
 ```
 
 The Safari runner serves this harness over `http://127.0.0.1:8080` by default

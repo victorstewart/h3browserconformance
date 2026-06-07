@@ -25,8 +25,13 @@ node wpt/run-wpt.mjs list \
 Smoke-test the pico_baton lifecycle adapter:
 
 ```sh
-cmake --build build -j$(sysctl -n hw.ncpu) --target pico_baton
-node wpt/run-wpt.mjs server-smoke --picoquic-root /path/to/picoquic
+cmake -S native/pico_baton -B build/pico_baton \
+  -DPICOQUIC_ROOT=/path/to/picoquic \
+  -DPICOQUIC_FETCH_PTLS:BOOL=ON
+cmake --build build/pico_baton -j$(sysctl -n hw.ncpu) --target pico_baton
+node wpt/run-wpt.mjs server-smoke \
+  --picoquic-root /path/to/picoquic \
+  --baton-bin build/pico_baton/pico_baton
 ```
 
 Dry-run the selected upstream WPT invocation without launching a browser:
